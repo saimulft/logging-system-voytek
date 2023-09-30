@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Kufam:ital,wght@0,500;0,600;0,800;0,900;1,400&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    font-family: 'Kufam', sans-serif;
+}
+
+.custom-shadow{
+    box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.1);
+}
+.btn-shadow{
+    box-shadow: 0px 0px 9px 2px rgba(0,0,0,0.1);
+}
+
+
+/* customize dateRange styles */
+.rdrCalendarWrapper{
+    font-size: 16px !important;
+}
+.rdrCalendarWrapper, .rdrDateRangeWrapper{
+    width: 100% !important;
+}
+.rdrMonth{
+    width: 100% !important;
+}
+.rdrDay:not(.rdrDayPassive) .rdrInRange ~ .rdrDayNumber span, .rdrDay:not(.rdrDayPassive) .rdrStartEdge ~ .rdrDayNumber span, .rdrDay:not(.rdrDayPassive) .rdrEndEdge ~ .rdrDayNumber span, .rdrDay:not(.rdrDayPassive) .rdrSelected ~ .rdrDayNumber span {
+    color: black !important;
+}
+.rdrDayToday .rdrDayNumber span::after{
+    background-color: #30FFE4 !important;
+}

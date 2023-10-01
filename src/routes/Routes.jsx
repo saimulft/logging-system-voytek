@@ -1,8 +1,6 @@
-import { createBrowserRouter, RouterProvider} from "react-router-dom";
-import App from "../App";
+import { createBrowserRouter} from "react-router-dom";
 import Home from "../pages/Home/Home";
 import Logs from "../pages/Logs/Logs";
-import Filter from "../pages/Filter/Filter";
 import Setting from "../pages/Setting/Setting";
 import LogDetails from "../pages/Logs/LogDetails";
 import Authentication from "../pages/Authentication/Authentication";
@@ -17,10 +15,6 @@ const router = createBrowserRouter([
     {
         path: "/project/logs/:id",
         element: <ProtectedRoute><Logs /></ProtectedRoute>,
-    },
-    {
-        path: "/logs/filter",
-        element: <ProtectedRoute><Filter /></ProtectedRoute>
     },
     {
         path: "/logs/log/:id",

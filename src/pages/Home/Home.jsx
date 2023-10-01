@@ -29,7 +29,6 @@ const Home = () => {
         fetch(`http://localhost:5000/all-projects?page=${currentPage}`)
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 setAllProjects(data)
             })
             .catch(error => console.log(error))
@@ -48,10 +47,8 @@ const Home = () => {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 setRefetch(!refetch)
                 setSowAddProject(!showAddProject)
-                console.log("Successfully created new Project")
             })
             .catch(error => console.log(error))
     }

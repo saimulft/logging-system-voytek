@@ -14,10 +14,7 @@ const Setting = () => {
         fetch('http://localhost:5000/signout', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
-                console.log(data)
-
                 if (data.status === 'success') {
-                    console.log("Signout successful!")
                     setUser(null)
                 }
             })
@@ -38,10 +35,8 @@ const Setting = () => {
             })
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data)
                     setPassword('')
                     setconfirmPassword('')
-                    console.log("Successfully changed password")
                 })
                 .catch(error => console.log(error))
         }

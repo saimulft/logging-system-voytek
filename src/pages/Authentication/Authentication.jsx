@@ -27,12 +27,10 @@ const Authentication = () => {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 setLoading(false)
 
                 if (data.status === 'success') {
                     setUser(data.userData)
-                    console.log("Login successful!")
                     navigate('/', { replace: true })
                 }
             })
@@ -58,11 +56,9 @@ const Authentication = () => {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 setLoading(false)
 
                 if (data.status === 'success') {
-                    console.log("Signup successful!")
                     setOpenSignupModal(false)
                     setOpenLoginModal(true)
                 }
@@ -84,14 +80,14 @@ const Authentication = () => {
                         <form onSubmit={handleLogin} className='flex justify-center items-center flex-col'>
                             <input className='w-3/5 my-3 p-2 border border-[#ddd] focus:outline-none placeholder:text-[#ABABAB]' placeholder='Enter your email' type="email" name='email' required />
                             <input className='w-3/5 my-3 p-2 border border-[#ddd] focus:outline-none placeholder:text-[#ABABAB]' placeholder='Enter your password' type="password" name='password' required />
-                            <p onClick={handleForgotPassword} className='hover:underline hover:cursor-pointer hover:text-[#A8A8A8] transition -ml-40'>Forgot Password?</p>
-                            <button type='submit' disabled={loading} className='mt-10 mb-10 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Login</button>
+                            {/* <p onClick={handleForgotPassword} className='hover:underline hover:cursor-pointer hover:text-[#A8A8A8] transition -ml-40'>Forgot Password?</p> */}
+                            <button type='submit' disabled={loading} className='mt-10 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Login</button>
                         </form>
 
-                        <p className='text-center'>Don&apos;t have an account? <span onClick={() => {
+                        {/* <p className='text-center'>Don&apos;t have an account? <span onClick={() => {
                             setOpenLoginModal(false)
                             setOpenSignupModal(true)
-                        }} className='underline cursor-pointer text-[#A8A8A8] transition hover:text-[#8a8a8a]'>Signup</span></p>
+                        }} className='underline cursor-pointer text-[#A8A8A8] transition hover:text-[#8a8a8a]'>Signup</span></p> */}
                     </div>
                 </div>
             }

@@ -5,13 +5,11 @@ export const AuthContext = createContext(null)
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
-    console.log(user)
 
     useEffect(() => {
         const fetchUser = async () => {
             const res = await fetch('http://localhost:5000/get-user', { credentials: 'include' })
             const data = await res.json()
-            console.log(data)
             setLoading(false)
 
             if (data.status === 'success') {

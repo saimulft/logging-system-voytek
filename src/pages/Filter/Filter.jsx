@@ -1,14 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MdOutlineDateRange } from 'react-icons/md';
 import { IoClose } from 'react-icons/io5';
 import { BsSearch } from 'react-icons/bs';
-import { Link} from 'react-router-dom';
 import { DateRange } from 'react-date-range';
 import { format, set } from 'date-fns';
-import { LogsContext } from '../../providers/LogsProvider';
 
-const Filter = ({ setOpenFilterModal, projectId, setTotalLogs, currentPage, logStatus}) => {
-    const { setProjectLogs } = useContext(LogsContext)
+const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, currentPage, logStatus}) => {
     const [openPersonSearchModal, setOpenPersonSearchModal] = useState(false)
     const [openDateRangeModal, setOpenDateRangeModal] = useState(false)
     const [dateChanged, setDateChanged] = useState(false)
@@ -21,10 +18,6 @@ const Filter = ({ setOpenFilterModal, projectId, setTotalLogs, currentPage, logS
     const [allUpcomingEnd, setAllUpcomingEnd] = useState()
     const [overDueStart, setOverDueStart] = useState()
     const [overDueEnd, setOverDueEnd] = useState()
-
-    // const navigate = useNavigate()
-    // const location = useLocation()
-    // const from = location.state?.from?.pathname || '/';
 
     const [descriptionContent, setDescriptionContent] = useState('')
     const [logType, setLogType] = useState(null)

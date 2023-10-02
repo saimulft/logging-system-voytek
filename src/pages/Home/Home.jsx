@@ -5,8 +5,10 @@ import { Link, useLoaderData, useLocation } from 'react-router-dom';
 import { IoSettingsSharp } from 'react-icons/io5';
 import SingleProject from './SingleProject';
 import { v4 as uuidv4 } from 'uuid';
+import ClipLoader from "react-spinners/ClipLoader";
 
 const Home = () => {
+    const [loading, setLoading] = useState(true)
     const [showProjectDetails, setShowProjectDetails] = useState(false)
     const [showAddProject, setSowAddProject] = useState(false)
     const [allProjects, setAllProjects] = useState([])
@@ -21,20 +23,34 @@ const Home = () => {
 
     // pagination related works
     const [currentPage, setCurrentPage] = useState(1)
-    const { totalProjects } = useLoaderData()
+    const [totalProjects, setTotalProjects] = useState(0)
     const pages = Math.ceil(totalProjects / 8)
-    const pagesNumber = [...Array(pages).keys()]
+    const pagesNumber = totalProjects && [...Array(pages).keys()]
 
     useEffect(() => {
+        fetch('http://localhost:5000/total-projects')
+            .then(res => res.json())
+            .then(data => {
+                setTotalProjects(data.totalProjects)
+            })
+    }, [refetch])
+
+    useEffect(() => {
+        setLoading(true)
+        setAllProjects([])
+        // setProjectLogs([]) //TODO: if not working properly then remove this lien
+
         fetch(`http://localhost:5000/all-projects?page=${currentPage}`)
             .then(res => res.json())
             .then(data => {
                 setAllProjects(data)
+                setLoading(false)
             })
             .catch(error => console.log(error))
     }, [refetch, currentPage])
 
     const handleAddProject = () => {
+        setLoading(true)
         const projectId = uuidv4();
         const project = { _id: projectId, project_name: projectName, client_name: client, project_code: code, project_notes: notes, project_logs: [] };
 
@@ -47,6 +63,7 @@ const Home = () => {
         })
             .then(res => res.json())
             .then(data => {
+                setLoading(false)
                 setRefetch(!refetch)
                 setSowAddProject(!showAddProject)
             })
@@ -74,10 +91,14 @@ const Home = () => {
                         allProjects?.map((project, index) => <SingleProject key={index} project={project} handleProjectDetails={handleProjectDetails} />).reverse()
                     }
                 </div>
+                {/* loader / spinner */}
+                <div className='flex justify-center mt-40'>
+                    <ClipLoader color="#000000" loading={loading} size={50} />
+                </div>
 
                 {/* pagination */}
                 {
-                    totalProjects > 8 && <div className='w-fit absolute left-1/2 right-1/2 transform translate-x-[-50%] -translate-y-[-50%] bottom-20 mx-auto rounded-full custom-shadow flex items-center gap-5 font-semibold text-xl'>
+                    totalProjects > 8 && !loading && <div className='w-fit absolute left-1/2 right-1/2 transform translate-x-[-50%] -translate-y-[-50%] bottom-20 mx-auto rounded-full custom-shadow flex items-center gap-5 font-semibold text-xl'>
                         <span className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesLeft size={24} /></span>
                         {
                             pagesNumber.map(page => <button onClick={() => setCurrentPage(page + 1)} key={page} className={currentPage === page + 1 ? 'text-black text-opacity-100' : 'text-black text-opacity-20'}> {page + 1} </button>)

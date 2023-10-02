@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
 import './index.css'
 import { RouterProvider } from "react-router-dom";
 import router from './routes/Routes.jsx';
@@ -10,14 +9,11 @@ AOS.init();
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import AuthProvider from './providers/AuthProvider.jsx';
-import LogsProvider from './providers/LogsProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
-      <LogsProvider>
-        <RouterProvider router={router} />
-      </LogsProvider>
+      <RouterProvider router={router} />
     </AuthProvider>
   </React.StrictMode>,
 )

@@ -10,7 +10,6 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <ProtectedRoute><Home /></ProtectedRoute>,
-        loader: () => fetch('http://localhost:5000/total-projects')
     },
     {
         path: "/project/logs/:id",

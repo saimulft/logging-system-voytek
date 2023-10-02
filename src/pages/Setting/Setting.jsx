@@ -11,7 +11,7 @@ const Setting = () => {
     const from = location.state?.from?.pathname || '/';
 
     const handleSignout = () => {
-        fetch('http://localhost:5000/signout', { credentials: 'include' })
+        fetch('http://164.92.108.233/signout', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
@@ -26,7 +26,7 @@ const Setting = () => {
             return console("Fill the input fileds in order to change password")
         }
         else if (password && password === confirmPassword) {
-            fetch('http://localhost:5000/change-password', {
+            fetch('http://164.92.108.233/change-password', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'

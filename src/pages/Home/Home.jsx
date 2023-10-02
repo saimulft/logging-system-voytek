@@ -28,7 +28,7 @@ const Home = () => {
     const pagesNumber = totalProjects && [...Array(pages).keys()]
 
     useEffect(() => {
-        fetch('http://localhost:5000/total-projects')
+        fetch('http://164.92.108.233/total-projects')
             .then(res => res.json())
             .then(data => {
                 setTotalProjects(data.totalProjects)
@@ -40,7 +40,7 @@ const Home = () => {
         setAllProjects([])
         // setProjectLogs([]) //TODO: if not working properly then remove this lien
 
-        fetch(`http://localhost:5000/all-projects?page=${currentPage}`)
+        fetch(`http://164.92.108.233/all-projects?page=${currentPage}`)
             .then(res => res.json())
             .then(data => {
                 setAllProjects(data)
@@ -54,7 +54,7 @@ const Home = () => {
         const projectId = uuidv4();
         const project = { _id: projectId, project_name: projectName, client_name: client, project_code: code, project_notes: notes, project_logs: [] };
 
-        fetch('http://localhost:5000/add-project', {
+        fetch('http://164.92.108.233/add-project', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'

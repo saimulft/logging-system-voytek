@@ -17,7 +17,7 @@ const Authentication = () => {
         const password = form.password.value;
         const user = { email, password }
 
-        fetch('http://localhost:5000/login', {
+        fetch('http://164.92.108.233/login', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -47,7 +47,7 @@ const Authentication = () => {
         const password = form.password.value;
         const user = { name, email, password };
 
-        fetch('http://localhost:5000/signup', {
+        fetch('http://164.92.108.233/signup', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'

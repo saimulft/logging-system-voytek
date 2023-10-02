@@ -45,7 +45,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
             logStatus: logStatus
         }
 
-        fetch('http://localhost:5000/filter-logs', {
+        fetch('http://164.92.108.233/filter-logs', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -77,7 +77,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
             totalLogs: true
         }
 
-        fetch('http://localhost:5000/filter-logs', {
+        fetch('http://164.92.108.233/filter-logs', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -92,7 +92,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
     }, [setTotalLogs, logStatus, allUpcomingStart, allUpcomingEnd, projectId, overDueStart, overDueEnd, descriptionContent, assingedPersonId, date, dateChanged, logTags, logType])
 
     useEffect(() => {
-        fetch(`http://localhost:5000/get-assigned-data?searchQuery=${assignedSearch}`)
+        fetch(`http://164.92.108.233/get-assigned-data?searchQuery=${assignedSearch}`)
             .then(res => res.json())
             .then(data => {
                 setAssignedData(data)
@@ -164,7 +164,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
                         <div>
                             <p className='text-2xl font-semibold mb-2'>Person Assigned</p>
                             <div onClick={() => setOpenPersonSearchModal(true)} className='py-2 pl-3 pr-8 min-w-[204px] max-w-fit mx-auto flex gap-4 items-center font-semibold text-[#A8A8A8] border border-[#CBCBCB] rounded-2xl cursor-pointer'>
-                                {assignedImage ? <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${assignedImage}`} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
+                                {assignedImage ? <img className="w-8 h-8 rounded-full " src={`http://164.92.108.233/images/${assignedImage}`} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
                                 {assignedName ? <p>{assignedName}</p> : <p>Mr. Jonas Doe</p>}
                             </div>
                         </div>
@@ -191,7 +191,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
                             <div className="px-6 py-3 space-y-5 h-[420px] overflow-y-auto">
                                 {
                                     assignedData?.map((person, index) => <div onClick={() => handleAssignData(person)} key={index} className='flex gap-2 items-center cursor-pointer'>
-                                        <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${person.assigned[0].image}`} alt="" />
+                                        <img className="w-8 h-8 rounded-full " src={`http://164.92.108.233/images/${person.assigned[0].image}`} alt="" />
                                         <p>{person.assigned[0].name}</p>
                                     </div>)
                                 }

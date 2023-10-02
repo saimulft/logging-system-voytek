@@ -1,10 +1,10 @@
 import { createBrowserRouter} from "react-router-dom";
 import Home from "../pages/Home/Home";
-import Logs from "../pages/Logs/Logs";
 import Setting from "../pages/Setting/Setting";
-import LogDetails from "../pages/Logs/LogDetails";
 import Authentication from "../pages/Authentication/Authentication";
 import ProtectedRoute from "./ProtectedRoute";
+import ProjectLogs from "../pages/ProjectLogs/ProjectLogs";
+import LogDetails from "../pages/ProjectLogs/LogDetails";
 
 const router = createBrowserRouter([
     {
@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/project/logs/:id",
-        element: <ProtectedRoute><Logs /></ProtectedRoute>,
+        element: <ProtectedRoute><ProjectLogs /></ProtectedRoute>,
     },
     {
         path: "/logs/log/:id",

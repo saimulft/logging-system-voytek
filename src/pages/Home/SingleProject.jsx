@@ -1,0 +1,25 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { BiNews } from 'react-icons/bi';
+import { FaRegEye } from 'react-icons/fa6';
+
+
+const SingleProject = ({ project, handleProjectDetails}) => {
+    const {_id, project_name, client_name, project_code} = project || {}
+
+    return (
+        <div className=' bg-white custom-shadow rounded-2xl relative'>
+            <button onClick={() => handleProjectDetails(_id)} className='absolute top-3 right-4 cursor-pointer'> <FaRegEye size={24} /> </button>
+            <Link to={`/project/logs/${_id}`}>
+                <div className='flex justify-center items-center flex-col p-8'>
+                    <BiNews className='text-4xl' />
+                    <p title={project_name} className='text-[#444] font-bold text-xl'>{project_name?.length > 13 ? `${project_name.slice(0, 13)}..` : project_name}</p>
+                    <p className=' font-semibold  text-[19px]  py-1'>{client_name}</p>
+                    <p className='font-semibold	text-[19px]'>{project_code}</p>
+                </div>
+            </Link>
+        </div>
+    );
+};
+
+export default SingleProject;

@@ -60,7 +60,7 @@ const LogDetails = () => {
     const [descriptionDueDate, setDescriptionDueDate] = useState(isoDate)
 
     useEffect(() => {
-        fetch(`http://164.92.108.233/get-single-log?logId=${id}&projectId=${projectId}`)
+        fetch(`http://localhost:5000/get-single-log?logId=${id}&projectId=${projectId}`)
             .then(res => res.json())
             .then(data => {
                 setLoading(false)
@@ -69,10 +69,19 @@ const LogDetails = () => {
     }, [refetch, id, projectId])
 
     useEffect(() => {
-        fetch(`http://164.92.108.233/get-assigned-data?searchQuery=${assignedSearch}`)
+        fetch(`http://localhost:5000/get-assigned-data?searchQuery=${assignedSearch}`)
             .then(res => res.json())
             .then(data => {
-                setAssignedData(data)
+                const filteredArray = [];
+                const uniqueIds = {};
+                data.forEach((obj) => {
+                    if (!uniqueIds[obj.assigned[0].assinged_person_id]) {
+                      uniqueIds[obj.assigned[0].assinged_person_id] = true;
+                      filteredArray.push(obj);
+                    }
+                  });
+                setAssignedData(filteredArray)
+                console.log(filteredArray)
             })
             .catch(error => console.log(error))
     }, [assignedSearch])
@@ -86,7 +95,7 @@ const LogDetails = () => {
             logTags: tagsArray
         }
 
-        fetch('http://164.92.108.233/update-log-tags', {
+        fetch('http://localhost:5000/update-log-tags', {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -108,7 +117,7 @@ const LogDetails = () => {
             logType: updatedLogType
         }
 
-        fetch('http://164.92.108.233/update-log-type', {
+        fetch('http://localhost:5000/update-log-type', {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -132,7 +141,7 @@ const LogDetails = () => {
             logDueDate: isoDueDate
         }
 
-        fetch('http://164.92.108.233/update-log-due-date', {
+        fetch('http://localhost:5000/update-log-due-date', {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -169,7 +178,7 @@ const LogDetails = () => {
                 }]
             }
 
-            fetch('http://164.92.108.233/update-assigned-data', {
+            fetch('http://localhost:5000/update-assigned-data', {
                 method: 'PUT',
                 headers: {
                     'Content-type': 'application/json'
@@ -212,7 +221,7 @@ const LogDetails = () => {
             logId: id
         }
 
-        fetch('http://164.92.108.233/add-descriptions', {
+        fetch('http://localhost:5000/add-descriptions', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -236,7 +245,7 @@ const LogDetails = () => {
             descriptionContent: updatedDescContent
         }
 
-        fetch('http://164.92.108.233/update-single-description', {
+        fetch('http://localhost:5000/update-single-description', {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -258,7 +267,7 @@ const LogDetails = () => {
             logId: id,
         }
 
-        fetch('http://164.92.108.233/update-log-status', {
+        fetch('http://localhost:5000/update-log-status', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -323,7 +332,7 @@ const LogDetails = () => {
                                 {!isEdit && <FiEdit onClick={() => setPersonSearchEdit(true)} size={18} className='absolute top-3 right-4 cursor-pointer' />}
                                 <p className='font-semibold text-xl'>Assigned - {assigned && assigned[0].name}</p>
                                 <div className="flex -space-x-4 justify-center items-center">
-                                    <img className="w-8 h-8 border-2 border-white rounded-full " src={assigned && `http://164.92.108.233/images/${assigned[0].image}`} alt="" />
+                                    <img className="w-8 h-8 border-2 border-white rounded-full " src={assigned && `http://localhost:5000/images/${assigned[0].image}`} alt="" />
                                 </div>
                             </div>
                             <div className={!isEdit ? 'relative text-center border-2 border-[#00000066] rounded-xl p-2' : 'text-center'}>
@@ -491,7 +500,7 @@ const LogDetails = () => {
                         <div className="px-6 py-3 space-y-5 h-[420px] overflow-y-auto">
                             {
                                 assignedData?.map((person, index) => <div key={index} onClick={() => handleAssignData(person)} className='flex gap-2 items-center cursor-pointer'>
-                                    <img className="w-8 h-8 rounded-full " src={`http://164.92.108.233/images/${person.assigned[0].image}`} alt="" />
+                                    <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${person.assigned[0].image}`} alt="" />
                                     <p>{person.assigned[0].name}</p>
                                 </div>)
                             }

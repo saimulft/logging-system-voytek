@@ -57,7 +57,7 @@ const ProjectLogs = () => {
     const pagesNumber = totalLogs && [...Array(pages).keys()]
 
     useEffect(() => {
-        fetch(`http://164.92.108.233/total-logs/${id}?logStatus=${logStatus}`)
+        fetch(`http://localhost:5000/total-logs/${id}?logStatus=${logStatus}`)
             .then(res => res.json())
             .then(data => {
                 setTotalLogs(data.totalLogs)
@@ -68,7 +68,7 @@ const ProjectLogs = () => {
         setLoading(true)
         setProjectLogs([])
 
-        fetch(`http://164.92.108.233/single-project/${id}?page=${currentPage}&logStatus=${logStatus}`)
+        fetch(`http://localhost:5000/single-project/${id}?page=${currentPage}&logStatus=${logStatus}`)
             .then(res => res.json())
             .then(data => {
                 setProjectLogs(data)
@@ -78,10 +78,20 @@ const ProjectLogs = () => {
     }, [refetch, id, currentPage, logStatus, setProjectLogs]);
 
     useEffect(() => {
-        fetch(`http://164.92.108.233/get-assigned-data?searchQuery=${assignedSearch}`)
+        fetch(`http://localhost:5000/get-assigned-data?searchQuery=${assignedSearch}`)
             .then(res => res.json())
             .then(data => {
-                setAssignedData(data)
+
+                const filteredArray = [];
+                const uniqueIds = {};
+                data.forEach((obj) => {
+                    if (!uniqueIds[obj.assigned[0].assinged_person_id]) {
+                      uniqueIds[obj.assigned[0].assinged_person_id] = true;
+                      filteredArray.push(obj);
+                    }
+                  });
+                setAssignedData(filteredArray)
+               
             })
             .catch(error => console.log(error))
     }, [assignedSearch, refetch])
@@ -102,7 +112,7 @@ const ProjectLogs = () => {
 
         const logData = { log_name: logName, log_id: logId, log_description: taskType === 'Risk' ? riskDesc : actionDesc, log_type: taskType, log_due_date: logDueDate, log_status: logStatus, log_tags: logTags, assigned: uploadImage ? [] : [{ name: assignedName, image: assignedImage, assinged_person_id: assingedPersonId }] }
 
-        fetch('http://164.92.108.233/add-log', {
+        fetch('http://localhost:5000/add-log', {
             method: 'PATCH',
             headers: {
                 'Content-type': 'application/json'
@@ -120,7 +130,7 @@ const ProjectLogs = () => {
                 formData.append('image', sendImageFile)
 
                 if (uploadImage) {
-                    fetch(`http://164.92.108.233/uploadImage?name=${assignedName}&id=${uuidv4()}&projectId=${id}&logId=${logId}`, {
+                    fetch(`http://localhost:5000/uploadImage?name=${assignedName}&id=${uuidv4()}&projectId=${id}&logId=${logId}`, {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -168,7 +178,7 @@ const ProjectLogs = () => {
     }
 
     const downloadPDF = () => {
-        fetch('http://164.92.108.233/download-logs-pdf', {
+        fetch('http://localhost:5000/download-logs-pdf', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -196,7 +206,7 @@ const ProjectLogs = () => {
     };
 
     const downloadExcel = () => {
-        fetch('http://164.92.108.233/download-logs-excel', {
+        fetch('http://localhost:5000/download-logs-excel', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -261,7 +271,7 @@ const ProjectLogs = () => {
                             <div>
                                 <p className='text-lg font-medium w-1/4'>Assigned</p>
                                 <div className="flex -space-x-4">
-                                    <img className="w-8 h-8 mx-auto border-2 border-white rounded-full " src={`http://164.92.108.233/images/${log.assigned[0]?.image}`} alt="" />
+                                    <img className="w-8 h-8 mx-auto border-2 border-white rounded-full " src={`http://localhost:5000/images/${log.assigned[0]?.image}`} alt="" />
                                 </div>
                             </div>
                             <div className='w-1/4'>
@@ -283,7 +293,7 @@ const ProjectLogs = () => {
                 {
                     !projectLogs?.length && !loading && <p className='text-3xl font-medium text-gray-400 text-center mt-[250px]'>No logs added yet!</p>
                 }
-                
+
                 {/* loader / spinner */}
                 <div className='flex justify-center mt-[250px]'>
                     <ClipLoader color="#000000" loading={loading} size={50} />
@@ -293,11 +303,20 @@ const ProjectLogs = () => {
             {/* pagination */}
             {
                 totalLogs > 4 && <div className='w-fit absolute left-1/2 right-1/2 transform translate-x-[-50%] -translate-y-[-50%] bottom-20 mx-auto rounded-full custom-shadow flex items-center gap-5 font-semibold text-xl'>
-                    <span className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesLeft size={24} /></span>
+                    <span onClick={() => {
+                        if (currentPage > 1) {
+                            setCurrentPage(currentPage - 1)
+                        }
+                    }} className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesLeft size={24} /></span>
                     {
                         pagesNumber.map(page => <button onClick={() => setCurrentPage(page + 1)} key={page} className={currentPage === page + 1 ? 'text-black text-opacity-100' : 'text-black text-opacity-20'}> {page + 1} </button>)
                     }
-                    <span className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesRight size={24} /></span>
+                    <span onClick={() => {
+
+                        if (pages > currentPage) {
+                            setCurrentPage(currentPage + 1)
+                        }
+                    }} className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesRight size={24} /></span>
                 </div>
             }
 
@@ -378,7 +397,7 @@ const ProjectLogs = () => {
                                     <div>
                                         <p className='mb-2 text-xl font-semibold text-gray-900'>Person Assigned</p>
                                         <div onClick={() => setOpenRiskPersonSearchModal(true)} className='py-5 pl-3 pr-8 w-full flex gap-4 items-center font-semibold text-xl text-[#A8A8A8] border border-[#CBCBCB] rounded-2xl cursor-pointer'>
-                                            {imageFile || assignedImage ? <img className="w-8 h-8 rounded-full " src={assignedImage ? `http://164.92.108.233/images/${assignedImage}` : imageFile} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
+                                            {imageFile || assignedImage ? <img className="w-8 h-8 rounded-full " src={assignedImage ? `http://localhost:5000/images/${assignedImage}` : imageFile} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
 
                                             {assignedName ? <p>{assignedName}</p> : <p>Mr. Jonas Doe</p>}
                                         </div>
@@ -421,7 +440,7 @@ const ProjectLogs = () => {
                         <div className="px-6 py-3 space-y-5 h-[220px] overflow-y-auto">
                             {
                                 assignedData?.map((person, index) => <div onClick={() => handleAssignData(person)} key={index} className='flex gap-2 items-center cursor-pointer'>
-                                    <img className="w-8 h-8 rounded-full " src={`http://164.92.108.233/images/${person.assigned[0]?.image}`} alt="" />
+                                    <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${person.assigned[0]?.image}`} alt="" />
                                     <p>{person.assigned[0]?.name}</p>
                                 </div>)
                             }
@@ -497,7 +516,7 @@ const ProjectLogs = () => {
                                     <div>
                                         <p className='mb-2 text-xl font-semibold text-gray-900'>Person Assigned</p>
                                         <div onClick={() => setOpenActionPersonSearchModal(true)} className='py-5 pl-3 pr-8 w-full flex gap-4 items-center font-semibold text-xl text-[#A8A8A8] border border-[#CBCBCB] rounded-2xl cursor-pointer'>
-                                            {imageFile || assignedImage ? <img className="w-8 h-8 rounded-full " src={assignedImage ? `http://164.92.108.233/images/${assignedImage}` : imageFile} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
+                                            {imageFile || assignedImage ? <img className="w-8 h-8 rounded-full " src={assignedImage ? `http://localhost:5000/images/${assignedImage}` : imageFile} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
 
                                             {assignedName ? <p>{assignedName}</p> : <p>Mr. Jonas Doe</p>}
                                         </div>
@@ -540,7 +559,7 @@ const ProjectLogs = () => {
                         <div className="px-6 py-3 space-y-5 h-[220px] overflow-y-auto">
                             {
                                 assignedData?.map((person, index) => <div onClick={() => handleAssignData(person)} key={index} className='flex gap-2 items-center cursor-pointer'>
-                                    <img className="w-8 h-8 rounded-full " src={`http://164.92.108.233/images/${person.assigned[0]?.image}`} alt="" />
+                                    <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${person.assigned[0]?.image}`} alt="" />
                                     <p>{person.assigned[0]?.name}</p>
                                 </div>)
                             }

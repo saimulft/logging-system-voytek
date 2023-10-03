@@ -2,6 +2,7 @@ import { useContext, useState } from 'react';
 import { FaAnglesLeft } from 'react-icons/fa6';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../providers/AuthProvider';
+import Cookies from 'js-cookie';
 
 const Setting = () => {
     const [password, setPassword] = useState('')
@@ -11,14 +12,8 @@ const Setting = () => {
     const from = location.state?.from?.pathname || '/';
 
     const handleSignout = () => {
-        fetch('http://164.92.108.233/signout', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    setUser(null)
-                }
-            })
-            .catch(error => console.log(error))
+        Cookies.remove("loginToken")
+        setUser(null)
     }
 
     const handleChangePassword = () => {
@@ -26,7 +21,7 @@ const Setting = () => {
             return console("Fill the input fileds in order to change password")
         }
         else if (password && password === confirmPassword) {
-            fetch('http://164.92.108.233/change-password', {
+            fetch('http://localhost:5000/change-password', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'

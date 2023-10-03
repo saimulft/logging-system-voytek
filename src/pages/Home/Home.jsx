@@ -28,7 +28,7 @@ const Home = () => {
     const pagesNumber = totalProjects && [...Array(pages).keys()]
 
     useEffect(() => {
-        fetch('http://164.92.108.233/total-projects')
+        fetch('http://localhost:5000/total-projects')
             .then(res => res.json())
             .then(data => {
                 setTotalProjects(data.totalProjects)
@@ -40,7 +40,7 @@ const Home = () => {
         setAllProjects([])
         // setProjectLogs([]) //TODO: if not working properly then remove this lien
 
-        fetch(`http://164.92.108.233/all-projects?page=${currentPage}`)
+        fetch(`http://localhost:5000/all-projects?page=${currentPage}`)
             .then(res => res.json())
             .then(data => {
                 setAllProjects(data)
@@ -54,7 +54,7 @@ const Home = () => {
         const projectId = uuidv4();
         const project = { _id: projectId, project_name: projectName, client_name: client, project_code: code, project_notes: notes, project_logs: [] };
 
-        fetch('http://164.92.108.233/add-project', {
+        fetch('http://localhost:5000/add-project', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -88,7 +88,7 @@ const Home = () => {
                 <button onClick={() => setSowAddProject(!showAddProject)} className='mt-8 custom-shadow ml-auto  block text-xl font-medium py-3 px-10 rounded-2xl bg-[#30FFE4]'>Add Project</button>
                 <div className='w-full grid grid-cols-4 mt-20 gap-[50px]'>
                     {
-                        allProjects?.map((project, index) => <SingleProject key={index} project={project} handleProjectDetails={handleProjectDetails} />).reverse()
+                        allProjects?.map((project, index) => <SingleProject key={index} project={project} handleProjectDetails={handleProjectDetails} />)
                     }
                 </div>
                 {/* loader / spinner */}
@@ -99,11 +99,20 @@ const Home = () => {
                 {/* pagination */}
                 {
                     totalProjects > 8 && !loading && <div className='w-fit absolute left-1/2 right-1/2 transform translate-x-[-50%] -translate-y-[-50%] bottom-20 mx-auto rounded-full custom-shadow flex items-center gap-5 font-semibold text-xl'>
-                        <span className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesLeft size={24} /></span>
+                        <span onClick={()=>{
+                            if(currentPage > 1){
+                                setCurrentPage( currentPage - 1)
+                            }
+                        }} className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesLeft size={24} /></span>
                         {
                             pagesNumber.map(page => <button onClick={() => setCurrentPage(page + 1)} key={page} className={currentPage === page + 1 ? 'text-black text-opacity-100' : 'text-black text-opacity-20'}> {page + 1} </button>)
                         }
-                        <span className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesRight size={24} /></span>
+                        <span onClick={()=>{
+                            
+                            if(pages > currentPage){
+                                setCurrentPage(currentPage + 1)
+                            }
+                        }} className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesRight size={24} /></span>
                     </div>
                 }
 
@@ -131,7 +140,7 @@ const Home = () => {
                         <input onChange={(e) => setCode(e.target.value)} className='focus:outline-none w-3/5 my-3 p-2 border border-[#ddd]' placeholder='Code' type="text" name='code' />
                         <input onChange={(e) => setNotes(e.target.value)} className='focus:outline-none w-3/5 my-3 p-2 border border-[#ddd]' placeholder='Notes' type="text" name='notes' />
 
-                        <button onClick={handleAddProject} className='mt-8 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Create</button>
+                        <button onClick={handleAddProject} disabled={!notes || !code || !client || !projectName} className='mt-8 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Create</button>
                     </div>
                 </div>
             }

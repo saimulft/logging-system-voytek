@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../providers/AuthProvider';
+import Cookies from 'js-cookie';
 
 const Authentication = () => {
     const [openLoginModal, setOpenLoginModal] = useState(true)
@@ -17,20 +18,20 @@ const Authentication = () => {
         const password = form.password.value;
         const user = { email, password }
 
-        fetch('http://164.92.108.233/login', {
+        fetch('http://localhost:5000/login', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
             },
             body: JSON.stringify(user),
-            credentials: 'include'
         })
             .then(res => res.json())
             .then(data => {
                 setLoading(false)
-
                 if (data.status === 'success') {
                     setUser(data.userData)
+                    const token = data.token
+                    Cookies.set("loginToken",token,{expires:7})
                     navigate('/', { replace: true })
                 }
             })
@@ -47,7 +48,7 @@ const Authentication = () => {
         const password = form.password.value;
         const user = { name, email, password };
 
-        fetch('http://164.92.108.233/signup', {
+        fetch('http://localhost:5000/signup', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -92,7 +93,7 @@ const Authentication = () => {
                 </div>
             }
 
-            {
+            {/* {
                 openSignupModal && <div className='absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
                     <div data-aos="zoom-in" className='relative custom-shadow rounded-2xl w-[500px] h-auto py-[50px] bg-[#fff]'>
                         <h3 className='text-3xl font-medium mb-4 text-center'>Signup your account</h3>
@@ -109,7 +110,7 @@ const Authentication = () => {
                         }} className='underline cursor-pointer text-[#A8A8A8] transition hover:text-[#8a8a8a]'>Login</span></p>
                     </div>
                 </div>
-            }
+            } */}
         </div>
     );
 };

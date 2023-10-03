@@ -11,7 +11,7 @@ const Setting = () => {
     const from = location.state?.from?.pathname || '/';
 
     const handleSignout = () => {
-        fetch('http://164.92.108.233/signout')
+        fetch('http://164.92.108.233/signout', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {

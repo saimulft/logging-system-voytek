@@ -23,7 +23,6 @@ const Authentication = () => {
                 'Content-type': 'application/json'
             },
             body: JSON.stringify(user),
-            credentials: 'include'
         })
             .then(res => res.json())
             .then(data => {

@@ -8,7 +8,7 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const res = await fetch('http://164.92.108.233/get-user', { credentials: 'include' })
+            const res = await fetch('http://164.92.108.233/get-user')
             const data = await res.json()
             setLoading(false)
 

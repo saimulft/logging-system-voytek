@@ -7,11 +7,10 @@ const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true)
 
     const token = Cookies.get("loginToken")
-    console.log(typeof(token))
 
     useEffect(() => {
         const fetchUser = async () => {
-            const res = await fetch(`http://localhost:5000/get-user?token=${token === undefined ? '' : token}`)
+            const res = await fetch(`${import.meta.env.VITE_BASE_URL}/get-user?token=${token === undefined ? '' : token}`)
             const data = await res.json()
             setLoading(false)
 

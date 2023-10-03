@@ -21,7 +21,7 @@ const Setting = () => {
             return console("Fill the input fileds in order to change password")
         }
         else if (password && password === confirmPassword) {
-            fetch('http://localhost:5000/change-password', {
+            fetch(`${import.meta.env.VITE_BASE_URL}/change-password`, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'

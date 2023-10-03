@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaAnglesLeft, FaAnglesRight } from 'react-icons/fa6';
 import { RiFileExcel2Fill } from 'react-icons/ri';
 import { FaFileDownload } from 'react-icons/fa';
@@ -17,7 +17,7 @@ const ProjectLogs = () => {
     const [loading, setLoading] = useState(true)
     const [projectLogs, setProjectLogs] = useState([])
     const [refetch, setRefetch] = useState(false)
-
+    const ref = useRef()
     const [openFilterModal, setOpenFilterModal] = useState(false)
     const [OpneCreateLogModal, setOpenCreateLogModal] = useState(false)
     const [openTaskTypeModal, setOpenTaskTypeModal] = useState(false)
@@ -46,7 +46,7 @@ const ProjectLogs = () => {
     const [assignedImage, setAssignedImage] = useState('')
     const [assingedPersonId, setAssingedPersonId] = useState('')
     const [uploadImage, setUploadImage] = useState(true)
-
+    const [isFilter, setIsFilter] = useState(false)
     const { id } = useParams()
     const location = useLocation()
 
@@ -57,7 +57,7 @@ const ProjectLogs = () => {
     const pagesNumber = totalLogs && [...Array(pages).keys()]
 
     useEffect(() => {
-        fetch(`http://localhost:5000/total-logs/${id}?logStatus=${logStatus}`)
+        fetch(`${import.meta.env.VITE_BASE_URL}/total-logs/${id}?logStatus=${logStatus}`)
             .then(res => res.json())
             .then(data => {
                 setTotalLogs(data.totalLogs)
@@ -68,7 +68,7 @@ const ProjectLogs = () => {
         setLoading(true)
         setProjectLogs([])
 
-        fetch(`http://localhost:5000/single-project/${id}?page=${currentPage}&logStatus=${logStatus}`)
+        fetch(`${import.meta.env.VITE_BASE_URL}/single-project/${id}?page=${currentPage}&logStatus=${logStatus}`)
             .then(res => res.json())
             .then(data => {
                 setProjectLogs(data)
@@ -78,7 +78,7 @@ const ProjectLogs = () => {
     }, [refetch, id, currentPage, logStatus, setProjectLogs]);
 
     useEffect(() => {
-        fetch(`http://localhost:5000/get-assigned-data?searchQuery=${assignedSearch}`)
+        fetch(`${import.meta.env.VITE_BASE_URL}/get-assigned-data?searchQuery=${assignedSearch}`)
             .then(res => res.json())
             .then(data => {
 
@@ -86,12 +86,12 @@ const ProjectLogs = () => {
                 const uniqueIds = {};
                 data.forEach((obj) => {
                     if (!uniqueIds[obj.assigned[0].assinged_person_id]) {
-                      uniqueIds[obj.assigned[0].assinged_person_id] = true;
-                      filteredArray.push(obj);
+                        uniqueIds[obj.assigned[0].assinged_person_id] = true;
+                        filteredArray.push(obj);
                     }
-                  });
+                });
                 setAssignedData(filteredArray)
-               
+
             })
             .catch(error => console.log(error))
     }, [assignedSearch, refetch])
@@ -112,7 +112,7 @@ const ProjectLogs = () => {
 
         const logData = { log_name: logName, log_id: logId, log_description: taskType === 'Risk' ? riskDesc : actionDesc, log_type: taskType, log_due_date: logDueDate, log_status: logStatus, log_tags: logTags, assigned: uploadImage ? [] : [{ name: assignedName, image: assignedImage, assinged_person_id: assingedPersonId }] }
 
-        fetch('http://localhost:5000/add-log', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/add-log`, {
             method: 'PATCH',
             headers: {
                 'Content-type': 'application/json'
@@ -130,7 +130,7 @@ const ProjectLogs = () => {
                 formData.append('image', sendImageFile)
 
                 if (uploadImage) {
-                    fetch(`http://localhost:5000/uploadImage?name=${assignedName}&id=${uuidv4()}&projectId=${id}&logId=${logId}`, {
+                    fetch(`${import.meta.env.VITE_BASE_URL}/uploadImage?name=${assignedName}&id=${uuidv4()}&projectId=${id}&logId=${logId}`, {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -178,7 +178,7 @@ const ProjectLogs = () => {
     }
 
     const downloadPDF = () => {
-        fetch('http://localhost:5000/download-logs-pdf', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/download-logs-pdf`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -206,7 +206,7 @@ const ProjectLogs = () => {
     };
 
     const downloadExcel = () => {
-        fetch('http://localhost:5000/download-logs-excel', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/download-logs-excel`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -251,7 +251,10 @@ const ProjectLogs = () => {
             <div className='flex justify-between items-center mb-10'>
                 <div className='flex gap-5 items-center'>
                     <button onClick={() => setOpenFilterModal(true)} className='bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold btn-shadow flex gap-2 items-center'><VscSettings size={20} /><div>Filter</div></button>
-                    <button onClick={() => setRefetch(!refetch)} className='py-3 px-14 border border-[#CBCBCB] rounded-2xl font-semibold flex gap-2 items-center'><AiOutlineClear size={20} /><div>Clear</div></button>
+                    {isFilter && <button onClick={() => {
+                        setRefetch(!refetch)
+                        setIsFilter(false)
+                    }} className='py-3 px-14 border border-[#CBCBCB] rounded-2xl font-semibold flex gap-2 items-center'><AiOutlineClear size={20} /><div>Clear</div></button>}
                 </div>
                 <div className='border rounded-2xl overflow-hidden btn-shadow border-[#30FFE4]'>
                     <button onClick={() => setLogStatus('open')} className={`py-3.5 px-10 text-sm font-semibold ${logStatus === 'open' && 'bg-[#30FFE4]'}`}>Open</button>
@@ -266,19 +269,20 @@ const ProjectLogs = () => {
                         <div className='px-8 py-4 flex justify-between items-center text-center rounded-2xl custom-shadow mb-12'>
                             <div className='text-lg font-medium w-1/4'>
                                 <p>Due Data</p>
-                                <p>{format(new Date(log.log_due_date), "y/MM/dd")}</p>
+                                <p>{format(new Date(log.log_due_date), "dd/MM/y")}</p>
                             </div>
                             <div>
                                 <p className='text-lg font-medium w-1/4'>Assigned</p>
                                 <div className="flex -space-x-4">
-                                    <img className="w-8 h-8 mx-auto border-2 border-white rounded-full " src={`http://localhost:5000/images/${log.assigned[0]?.image}`} alt="" />
+                                    <img className="w-8 h-8 mx-auto border-2 border-white rounded-full " src={`${import.meta.env.VITE_BASE_URL}/images/${log.assigned[0]?.image}`} alt="" />
                                 </div>
                             </div>
                             <div className='w-1/4'>
                                 <p className='text-xl font-medium'>Description</p>
                                 <p className='text-lg font-medium'>
                                     {
-                                        log.log_type === 'Risk' ? log?.log_description?.risk_description[0]?.content : log?.log_description?.action_description[0]?.content
+
+                                        log.log_type === 'Risk' ? log?.log_description?.risk_description[log?.log_description?.risk_description.length - 1]?.content : log?.log_description?.action_description[log?.log_description?.action_description.length - 1]?.content
                                     }
                                 </p>
                             </div>
@@ -324,12 +328,15 @@ const ProjectLogs = () => {
             {
                 OpneCreateLogModal && <div onClick={() => setOpenCreateLogModal(false)} className='absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
                     <div onClick={(event) => { event.stopPropagation() }} data-aos="zoom-in" className='relative custom-shadow rounded-2xl w-[500px] h-auto py-[50px] bg-[#fff] flex justify-center items-center flex-col'>
-                        <input onChange={(e) => setLogName(e.target.value)} className='w-3/5 my-3 p-2 border border-[#ddd] focus:outline-none' placeholder='Give a name' type="text" />
+                        <input onChange={(e) => setLogName(e.target.value)} className='w-3/5 my-3 p-2 border border-[#ddd] focus:outline-none' placeholder='Log name' type="text" />
                         <input onChange={(e) => {
                             const inputValue = new Date(e.target.value)
                             const isoDate = inputValue.toISOString()
                             setLogDueDate(isoDate)
-                        }} className='w-3/5 my-3 p-2 border border-[#ddd] text-[#A8A8A8] focus:outline-none' type="date" />
+                        }} className='w-3/5 my-3 p-2 border border-[#ddd] text-[#A8A8A8] focus:outline-none'
+                            placeholder="dd/mm/yyyy"
+
+                            type="date" />
 
                         <button onClick={() => {
                             if (logName && logDueDate) {
@@ -397,7 +404,7 @@ const ProjectLogs = () => {
                                     <div>
                                         <p className='mb-2 text-xl font-semibold text-gray-900'>Person Assigned</p>
                                         <div onClick={() => setOpenRiskPersonSearchModal(true)} className='py-5 pl-3 pr-8 w-full flex gap-4 items-center font-semibold text-xl text-[#A8A8A8] border border-[#CBCBCB] rounded-2xl cursor-pointer'>
-                                            {imageFile || assignedImage ? <img className="w-8 h-8 rounded-full " src={assignedImage ? `http://localhost:5000/images/${assignedImage}` : imageFile} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
+                                            {imageFile || assignedImage ? <img className="w-8 h-8 rounded-full " src={assignedImage ? `${import.meta.env.VITE_BASE_URL}/images/${assignedImage}` : imageFile} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
 
                                             {assignedName ? <p>{assignedName}</p> : <p>Mr. Jonas Doe</p>}
                                         </div>
@@ -440,7 +447,7 @@ const ProjectLogs = () => {
                         <div className="px-6 py-3 space-y-5 h-[220px] overflow-y-auto">
                             {
                                 assignedData?.map((person, index) => <div onClick={() => handleAssignData(person)} key={index} className='flex gap-2 items-center cursor-pointer'>
-                                    <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${person.assigned[0]?.image}`} alt="" />
+                                    <img className="w-8 h-8 rounded-full " src={`${import.meta.env.VITE_BASE_URL}/images/${person.assigned[0]?.image}`} alt="" />
                                     <p>{person.assigned[0]?.name}</p>
                                 </div>)
                             }
@@ -516,7 +523,7 @@ const ProjectLogs = () => {
                                     <div>
                                         <p className='mb-2 text-xl font-semibold text-gray-900'>Person Assigned</p>
                                         <div onClick={() => setOpenActionPersonSearchModal(true)} className='py-5 pl-3 pr-8 w-full flex gap-4 items-center font-semibold text-xl text-[#A8A8A8] border border-[#CBCBCB] rounded-2xl cursor-pointer'>
-                                            {imageFile || assignedImage ? <img className="w-8 h-8 rounded-full " src={assignedImage ? `http://localhost:5000/images/${assignedImage}` : imageFile} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
+                                            {imageFile || assignedImage ? <img className="w-8 h-8 rounded-full " src={assignedImage ? `${import.meta.env.VITE_BASE_URL}/images/${assignedImage}` : imageFile} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
 
                                             {assignedName ? <p>{assignedName}</p> : <p>Mr. Jonas Doe</p>}
                                         </div>
@@ -559,7 +566,7 @@ const ProjectLogs = () => {
                         <div className="px-6 py-3 space-y-5 h-[220px] overflow-y-auto">
                             {
                                 assignedData?.map((person, index) => <div onClick={() => handleAssignData(person)} key={index} className='flex gap-2 items-center cursor-pointer'>
-                                    <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${person.assigned[0]?.image}`} alt="" />
+                                    <img className="w-8 h-8 rounded-full " src={`${import.meta.env.VITE_BASE_URL}/images/${person.assigned[0]?.image}`} alt="" />
                                     <p>{person.assigned[0]?.name}</p>
                                 </div>)
                             }
@@ -616,7 +623,7 @@ const ProjectLogs = () => {
 
             {/* logs filter */}
             {
-                openFilterModal && <Filter setProjectLogs={setProjectLogs} projectId={id} setOpenFilterModal={setOpenFilterModal} setTotalLogs={setTotalLogs} currentPage={currentPage} logStatus={logStatus} />
+                openFilterModal && <Filter setLoading={setLoading} setIsFilter={setIsFilter} setProjectLogs={setProjectLogs} projectId={id} setOpenFilterModal={setOpenFilterModal} setTotalLogs={setTotalLogs} currentPage={currentPage} logStatus={logStatus} />
             }
         </div >
     );

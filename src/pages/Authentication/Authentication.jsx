@@ -9,6 +9,8 @@ const Authentication = () => {
     const { setUser, loading, setLoading } = useContext(AuthContext)
     const navigate = useNavigate()
 
+
+  
     const handleLogin = (event) => {
         event.preventDefault()
         setLoading(true)
@@ -18,7 +20,7 @@ const Authentication = () => {
         const password = form.password.value;
         const user = { email, password }
 
-        fetch('http://localhost:5000/login', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -31,7 +33,7 @@ const Authentication = () => {
                 if (data.status === 'success') {
                     setUser(data.userData)
                     const token = data.token
-                    Cookies.set("loginToken",token,{expires:7})
+                    Cookies.set("loginToken", token, { expires: 7 })
                     navigate('/', { replace: true })
                 }
             })
@@ -48,7 +50,7 @@ const Authentication = () => {
         const password = form.password.value;
         const user = { name, email, password };
 
-        fetch('http://localhost:5000/signup', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/signup`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'

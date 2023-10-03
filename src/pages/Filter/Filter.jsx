@@ -5,7 +5,10 @@ import { BsSearch } from 'react-icons/bs';
 import { DateRange } from 'react-date-range';
 import { format, set } from 'date-fns';
 
-const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, currentPage, logStatus}) => {
+const Filter = ({ setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, currentPage, logStatus, setIsFilter, setLoading }) => {
+
+
+
     const [openPersonSearchModal, setOpenPersonSearchModal] = useState(false)
     const [openDateRangeModal, setOpenDateRangeModal] = useState(false)
     const [dateChanged, setDateChanged] = useState(false)
@@ -29,6 +32,9 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
     const [assingedPersonId, setAssingedPersonId] = useState('')
 
     const handleFilter = () => {
+        setLoading(true)
+        setOpenFilterModal(false)
+        setProjectLogs([])
         const filterObj = {
             projectId: projectId,
             startDate: dateChanged ? format(new Date(date[0].startDate), "y-MM-dd") : '',
@@ -45,7 +51,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
             logStatus: logStatus
         }
 
-        fetch('http://localhost:5000/filter-logs', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/filter-logs`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -54,8 +60,10 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
         })
             .then(res => res.json())
             .then(data => {
+                setIsFilter(true)
                 setProjectLogs(data)
-                setOpenFilterModal(false)
+                setLoading(false)
+
             })
             .catch(error => console.log(error))
     }
@@ -77,7 +85,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
             totalLogs: true
         }
 
-        fetch('http://localhost:5000/filter-logs', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/filter-logs`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -92,7 +100,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
     }, [setTotalLogs, logStatus, allUpcomingStart, allUpcomingEnd, projectId, overDueStart, overDueEnd, descriptionContent, assingedPersonId, date, dateChanged, logTags, logType])
 
     useEffect(() => {
-        fetch(`http://localhost:5000/get-assigned-data?searchQuery=${assignedSearch}`)
+        fetch(`${import.meta.env.VITE_BASE_URL}/get-assigned-data?searchQuery=${assignedSearch}`)
             .then(res => res.json())
             .then(data => {
                 setAssignedData(data)
@@ -164,7 +172,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
                         <div>
                             <p className='text-2xl font-semibold mb-2'>Person Assigned</p>
                             <div onClick={() => setOpenPersonSearchModal(true)} className='py-2 pl-3 pr-8 min-w-[204px] max-w-fit mx-auto flex gap-4 items-center font-semibold text-[#A8A8A8] border border-[#CBCBCB] rounded-2xl cursor-pointer'>
-                                {assignedImage ? <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${assignedImage}`} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
+                                {assignedImage ? <img className="w-8 h-8 rounded-full " src={`${import.meta.env.VITE_BASE_URL}/images/${assignedImage}`} alt="" /> : <img className="w-8 h-8 rounded-full " src="/image_avatar.png" alt="" />}
                                 {assignedName ? <p>{assignedName}</p> : <p>Mr. Jonas Doe</p>}
                             </div>
                         </div>
@@ -191,7 +199,7 @@ const Filter = ({setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, cu
                             <div className="px-6 py-3 space-y-5 h-[420px] overflow-y-auto">
                                 {
                                     assignedData?.map((person, index) => <div onClick={() => handleAssignData(person)} key={index} className='flex gap-2 items-center cursor-pointer'>
-                                        <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${person.assigned[0].image}`} alt="" />
+                                        <img className="w-8 h-8 rounded-full " src={`${import.meta.env.VITE_BASE_URL}/images/${person.assigned[0].image}`} alt="" />
                                         <p>{person.assigned[0].name}</p>
                                     </div>)
                                 }

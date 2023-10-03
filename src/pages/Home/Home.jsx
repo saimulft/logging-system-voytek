@@ -28,7 +28,7 @@ const Home = () => {
     const pagesNumber = totalProjects && [...Array(pages).keys()]
 
     useEffect(() => {
-        fetch('http://localhost:5000/total-projects')
+        fetch(`${import.meta.env.VITE_BASE_URL}/total-projects`)
             .then(res => res.json())
             .then(data => {
                 setTotalProjects(data.totalProjects)
@@ -38,9 +38,7 @@ const Home = () => {
     useEffect(() => {
         setLoading(true)
         setAllProjects([])
-        // setProjectLogs([]) //TODO: if not working properly then remove this lien
-
-        fetch(`http://localhost:5000/all-projects?page=${currentPage}`)
+        fetch(`${import.meta.env.VITE_BASE_URL}/all-projects?page=${currentPage}`)
             .then(res => res.json())
             .then(data => {
                 setAllProjects(data)
@@ -54,7 +52,7 @@ const Home = () => {
         const projectId = uuidv4();
         const project = { _id: projectId, project_name: projectName, client_name: client, project_code: code, project_notes: notes, project_logs: [] };
 
-        fetch('http://localhost:5000/add-project', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/add-project`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -99,17 +97,17 @@ const Home = () => {
                 {/* pagination */}
                 {
                     totalProjects > 8 && !loading && <div className='w-fit absolute left-1/2 right-1/2 transform translate-x-[-50%] -translate-y-[-50%] bottom-20 mx-auto rounded-full custom-shadow flex items-center gap-5 font-semibold text-xl'>
-                        <span onClick={()=>{
-                            if(currentPage > 1){
-                                setCurrentPage( currentPage - 1)
+                        <span onClick={() => {
+                            if (currentPage > 1) {
+                                setCurrentPage(currentPage - 1)
                             }
                         }} className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesLeft size={24} /></span>
                         {
                             pagesNumber.map(page => <button onClick={() => setCurrentPage(page + 1)} key={page} className={currentPage === page + 1 ? 'text-black text-opacity-100' : 'text-black text-opacity-20'}> {page + 1} </button>)
                         }
-                        <span onClick={()=>{
-                            
-                            if(pages > currentPage){
+                        <span onClick={() => {
+
+                            if (pages > currentPage) {
                                 setCurrentPage(currentPage + 1)
                             }
                         }} className='px-5 h-12 rounded-full border cursor-pointer border[#ADADAD] flex items-center justify-center'><FaAnglesRight size={24} /></span>

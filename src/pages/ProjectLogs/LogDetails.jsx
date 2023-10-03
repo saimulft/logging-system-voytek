@@ -4,7 +4,7 @@ import { MdOutlineDone } from 'react-icons/md';
 import { FiEdit } from 'react-icons/fi';
 import { GrClose } from 'react-icons/gr';
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { BsSearch } from 'react-icons/bs';
@@ -37,6 +37,12 @@ const LogDetails = () => {
     const [assignedImage, setAssignedImage] = useState('')
     const [assingedPersonId, setAssingedPersonId] = useState('')
 
+
+    const navigate = useNavigate()
+    const [logNameEdit, setLogNameEdit] = useState(false)
+    const [newLogName, setNewLogName] = useState('')
+
+
     const location = useLocation()
     const from = location.state?.from?.pathname || '/';
     const { id } = useParams()
@@ -60,7 +66,7 @@ const LogDetails = () => {
     const [descriptionDueDate, setDescriptionDueDate] = useState(isoDate)
 
     useEffect(() => {
-        fetch(`http://localhost:5000/get-single-log?logId=${id}&projectId=${projectId}`)
+        fetch(`${import.meta.env.VITE_BASE_URL}/get-single-log?logId=${id}&projectId=${projectId}`)
             .then(res => res.json())
             .then(data => {
                 setLoading(false)
@@ -69,22 +75,48 @@ const LogDetails = () => {
     }, [refetch, id, projectId])
 
     useEffect(() => {
-        fetch(`http://localhost:5000/get-assigned-data?searchQuery=${assignedSearch}`)
+        fetch(`${import.meta.env.VITE_BASE_URL}/get-assigned-data?searchQuery=${assignedSearch}`)
             .then(res => res.json())
             .then(data => {
                 const filteredArray = [];
                 const uniqueIds = {};
                 data.forEach((obj) => {
                     if (!uniqueIds[obj.assigned[0].assinged_person_id]) {
-                      uniqueIds[obj.assigned[0].assinged_person_id] = true;
-                      filteredArray.push(obj);
+                        uniqueIds[obj.assigned[0].assinged_person_id] = true;
+                        filteredArray.push(obj);
                     }
-                  });
+                });
                 setAssignedData(filteredArray)
                 console.log(filteredArray)
             })
             .catch(error => console.log(error))
     }, [assignedSearch])
+
+
+    const handleUpdateLogName = () => {
+
+
+        const updatedName = {
+            projectId: projectId,
+            logId: id,
+            logName: newLogName
+        }
+
+        fetch(`${import.meta.env.VITE_BASE_URL}/update-log-name`, {
+            method: 'PUT',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(updatedName)
+        })
+            .then(res => res.json())
+            .then(data => {
+                setRefetch(!refetch)
+                setLogNameEdit(false)
+            })
+            .catch(error => console.log(error))
+    }
+
 
     const handleUpdateLogTags = () => {
         const tagsArray = updatedLogTags.split(',');
@@ -95,7 +127,7 @@ const LogDetails = () => {
             logTags: tagsArray
         }
 
-        fetch('http://localhost:5000/update-log-tags', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/update-log-tags`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -117,7 +149,7 @@ const LogDetails = () => {
             logType: updatedLogType
         }
 
-        fetch('http://localhost:5000/update-log-type', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/update-log-type`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -141,7 +173,7 @@ const LogDetails = () => {
             logDueDate: isoDueDate
         }
 
-        fetch('http://localhost:5000/update-log-due-date', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/update-log-due-date`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -178,7 +210,7 @@ const LogDetails = () => {
                 }]
             }
 
-            fetch('http://localhost:5000/update-assigned-data', {
+            fetch(`${import.meta.env.VITE_BASE_URL}/update-assigned-data`, {
                 method: 'PUT',
                 headers: {
                     'Content-type': 'application/json'
@@ -221,7 +253,7 @@ const LogDetails = () => {
             logId: id
         }
 
-        fetch('http://localhost:5000/add-descriptions', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/add-descriptions`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -245,7 +277,7 @@ const LogDetails = () => {
             descriptionContent: updatedDescContent
         }
 
-        fetch('http://localhost:5000/update-single-description', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/update-single-description`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -267,7 +299,7 @@ const LogDetails = () => {
             logId: id,
         }
 
-        fetch('http://localhost:5000/update-log-status', {
+        fetch(`${import.meta.env.VITE_BASE_URL}/update-log-status`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -276,6 +308,7 @@ const LogDetails = () => {
         })
             .then(res => res.json())
             .then(data => {
+                navigate(from)
                 setTask(!task)
                 setRefetch(!refetch)
             })
@@ -292,12 +325,26 @@ const LogDetails = () => {
                 <div className='grid grid-cols-3'>
                     {isUpdate ? <div onClick={() => setIsUpdate(false)} className='cursor-pointer'><FaAnglesLeft size={24} /></div> : <Link to={from} onClick={() => setIsUpdate(false)} className='cursor-pointer'><FaAnglesLeft size={24} /></Link>}
 
-                    <div><h1 className='text-4xl font-bold text-center'>{log_name}</h1></div>
+
+                    <div className='relative'>
+
+
+                        <h1 className={!isEdit ? 'relative border-2 border-[#00000066] p-2 rounded-xl text-4xl font-bold text-center' : 'text-4xl font-bold text-center'}>{log_name}</h1>
+                        {!isEdit && <FiEdit onClick={() => {
+                            setLogNameEdit(true)
+                        }} size={18} className='absolute top-3 right-4 cursor-pointer' />}
+
+                    </div>
+
+
                     {!isUpdate == false || isEdit && <div className='flex justify-end'>
-                        <div onClick={() => setIsUpdate(!isUpdate)} className='ml-10  flex justify-center items-center w-12 h-12  custom-shadow rounded-full right-12 cursor-pointer'><AiOutlinePlus size={22} /></div>
+                        {log_status === "open" && <div onClick={() => setIsUpdate(!isUpdate)} className='ml-10  flex justify-center items-center w-12 h-12  custom-shadow rounded-full right-12 cursor-pointer'><AiOutlinePlus size={22} /></div>}
+
                         {log_status === "open" && <div onClick={() => setTask(!task)} className='ml-10  flex justify-center items-center w-12 h-12  custom-shadow rounded-full right-12 cursor-pointer'><MdOutlineDone size={22} /></div>}
+
                         <div onClick={() => setIsEdit(!isEdit)} className='ml-10  flex justify-center items-center w-12 h-12  custom-shadow  rounded-full right-12 cursor-pointer'><FiEdit size={22} /></div>
                     </div>}
+
                 </div>
                 {isUpdate ?
                     <div>
@@ -332,7 +379,7 @@ const LogDetails = () => {
                                 {!isEdit && <FiEdit onClick={() => setPersonSearchEdit(true)} size={18} className='absolute top-3 right-4 cursor-pointer' />}
                                 <p className='font-semibold text-xl'>Assigned - {assigned && assigned[0].name}</p>
                                 <div className="flex -space-x-4 justify-center items-center">
-                                    <img className="w-8 h-8 border-2 border-white rounded-full " src={assigned && `http://localhost:5000/images/${assigned[0].image}`} alt="" />
+                                    <img className="w-8 h-8 border-2 border-white rounded-full " src={assigned && `${import.meta.env.VITE_BASE_URL}/images/${assigned[0].image}`} alt="" />
                                 </div>
                             </div>
                             <div className={!isEdit ? 'relative text-center border-2 border-[#00000066] rounded-xl p-2' : 'text-center'}>
@@ -384,7 +431,7 @@ const LogDetails = () => {
 
                         </div>
                         {!isEdit && <div className='flex justify-end'>
-                            <button onClick={() => setIsEdit(!isEdit)} className='mr-8 mt-10 bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Cancel</button>
+                            <button onClick={() => setIsEdit(!isEdit)} className='mr-8 mt-10 bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Update</button>
                         </div>}
                     </>
                 }
@@ -500,7 +547,7 @@ const LogDetails = () => {
                         <div className="px-6 py-3 space-y-5 h-[420px] overflow-y-auto">
                             {
                                 assignedData?.map((person, index) => <div key={index} onClick={() => handleAssignData(person)} className='flex gap-2 items-center cursor-pointer'>
-                                    <img className="w-8 h-8 rounded-full " src={`http://localhost:5000/images/${person.assigned[0].image}`} alt="" />
+                                    <img className="w-8 h-8 rounded-full " src={`${import.meta.env.VITE_BASE_URL}/images/${person.assigned[0].image}`} alt="" />
                                     <p>{person.assigned[0].name}</p>
                                 </div>)
                             }
@@ -508,6 +555,24 @@ const LogDetails = () => {
                     </div>
                 </div>
             }
+            {/* description edit modal */}
+            {logNameEdit && <div onClick={() => {
+                setLogNameEdit(false)
+
+            }} className=' absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
+                <div onClick={(e) => e.stopPropagation()} data-aos="zoom-in" className='relative px-10 custom-shadow rounded-2xl w-[500px] h-auto py-[50px] bg-[#fff] flex justify-center items-center flex-col'>
+                    <div onClick={() => {
+                        setLogNameEdit(false)
+                    }} className='absolute right-10 top-8'><GrClose className='text-xl cursor-pointer overflow-hidden	' /></div>
+
+                    <div className='my-5'>
+                        <h1 className='mb-6 text-3xl '>Change Log Name</h1>
+                        <textarea onChange={(e) => setNewLogName(e.target.value)} className='w-full p-2 text-xl border border-[#ddd] focus:outline-none' name="" id="" cols="50" rows="1" defaultValue={`${log_name}`}></textarea>
+                    </div>
+                    <div><button onClick={handleUpdateLogName} className='block ml-auto bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Update</button></div>
+                </div>
+            </div>}
+
         </section>
     );
 };

@@ -530,7 +530,7 @@ const LogDetails = () => {
 
                     <div className='my-5'>
                         <h1 className='mb-3 text-3xl'>{log_type} Description</h1>
-                        <textarea onChange={(e) => setUpdatedDescContent(e.target.value)} className='w-full p-2 text-xl border border-[#ddd] focus:outline-none' name="" id="" cols="50" rows="1" defaultValue={`${currentEditDesc.content}`}></textarea>
+                        <textarea onChange={(e) => setUpdatedDescContent(e.target.value)} className='w-full p-2 text-xl border border-[#ddd] focus:outline-none' name="" id="" cols="50" rows="2" defaultValue={`${currentEditDesc.content}`}></textarea>
                     </div>
                     <div><button onClick={handleUpdateDescription} className='block ml-auto bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Update</button></div>
                 </div>

@@ -272,7 +272,7 @@ const ProjectLogs = () => {
             <div className='space-y-12'>
                 {
                     projectLogs?.map((log, index) => <Link to={`/logs/log/${log.log_id}?projectId=${id}`} state={{ from: location }} key={index}>
-                        <div className=' py-6 flex justify-between items-center text-center rounded-2xl custom-shadow mb-12'>
+                        <div className=' py-5 flex justify-between items-center text-center rounded-2xl custom-shadow mb-10'>
                             <div className='text-lg font-medium w-1/5'>
                                 <p>Due Data</p>
                                 <p>{format(new Date(log.log_due_date), "dd/MM/y")}</p>

@@ -6,12 +6,14 @@ import { IoSettingsSharp } from 'react-icons/io5';
 import { MdAdd } from 'react-icons/md';
 import { VscSettings } from 'react-icons/vsc';
 import { AiOutlineClear } from 'react-icons/ai';
+import { FaRegCalendarDays } from 'react-icons/fa6';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { BsSearch } from 'react-icons/bs';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns'
 import Filter from '../Filter/Filter';
 import ClipLoader from 'react-spinners/ClipLoader';
+import { Calendar } from 'react-date-range';
 
 const ProjectLogs = () => {
     const [loading, setLoading] = useState(true)
@@ -49,12 +51,16 @@ const ProjectLogs = () => {
     const [isFilter, setIsFilter] = useState(false)
     const { id } = useParams()
     const location = useLocation()
-
+    const [openCalender, setOpenCalender] = useState(false)
+    const [openRiskCalender, setOpenRiskCalender] = useState(false)
+    const [openActionCalender, setOpenActionCalender] = useState(false)
     // pagination related works
     const [currentPage, setCurrentPage] = useState(1)
     const [totalLogs, setTotalLogs] = useState(0)
     const pages = Math.ceil(totalLogs / 4)
     const pagesNumber = totalLogs && [...Array(pages).keys()]
+
+    console.log(descriptionDate)
 
     useEffect(() => {
         fetch(`${import.meta.env.VITE_BASE_URL}/total-logs/${id}?logStatus=${logStatus}`)
@@ -266,27 +272,48 @@ const ProjectLogs = () => {
             <div className='space-y-12'>
                 {
                     projectLogs?.map((log, index) => <Link to={`/logs/log/${log.log_id}?projectId=${id}`} state={{ from: location }} key={index}>
-                        <div className='px-8 py-4 flex justify-between items-center text-center rounded-2xl custom-shadow mb-12'>
-                            <div className='text-lg font-medium w-1/4'>
+                        <div className=' py-6 flex justify-between items-center text-center rounded-2xl custom-shadow mb-12'>
+                            <div className='text-lg font-medium w-1/5'>
                                 <p>Due Data</p>
                                 <p>{format(new Date(log.log_due_date), "dd/MM/y")}</p>
                             </div>
-                            <div>
-                                <p className='text-lg font-medium w-1/4'>Assigned</p>
+                            <div className='text-lg font-medium w-1/5'>
+                                <p>Log Name</p>
+                                <p>{log.log_name}</p>
+                            </div>
+                            <div className='w-1/5'>
+                                <p className='text-lg font-medium'>Assigned</p>
                                 <div className="flex -space-x-4">
                                     <img className="w-8 h-8 mx-auto border-2 border-white rounded-full " src={`${import.meta.env.VITE_BASE_URL}/images/${log.assigned[0]?.image}`} alt="" />
                                 </div>
                             </div>
-                            <div className='w-1/4'>
+                            <div className='w-1/5'>
                                 <p className='text-xl font-medium'>Description</p>
-                                <p className='text-lg font-medium'>
+                                <p title={
+
+                                    log.log_type === 'Risk' ? log?.log_description?.risk_description[log?.log_description?.risk_description.length - 1]?.content : log?.log_description?.action_description[log?.log_description?.action_description.length - 1]?.content
+                                } className='text-lg font-medium'>
                                     {
 
-                                        log.log_type === 'Risk' ? log?.log_description?.risk_description[log?.log_description?.risk_description.length - 1]?.content : log?.log_description?.action_description[log?.log_description?.action_description.length - 1]?.content
+                                        log.log_type === 'Risk' ? log?.log_description?.risk_description[log?.log_description?.risk_description.length - 1]?.content.slice(0, 22) : log?.log_description?.action_description[log?.log_description?.action_description.length - 1]?.content.slice(0, 22)
                                     }
+                                  {   log.log_type === 'Risk' && <span>
+                                        {
+                                        log?.log_description?.risk_description[log?.log_description?.risk_description.length - 1].content.length > 20 && "..."
+                                        
+                                        }
+
+                                    </span>}
+                                  {   log.log_type === 'Action' && <span>
+                                        {
+                                        log?.log_description?.action_description[log?.log_description?.action_description.length - 1].content.length > 20 && "..."
+                                        
+                                        }
+
+                                    </span>}
                                 </p>
                             </div>
-                            <div className='w-1/4'>
+                            <div className='w-1/5'>
                                 <p className='text-xl font-medium'>Type</p>
                                 <p className='text-lg font-medium  text-[#FF1515]'>{log.log_type}</p>
                             </div>
@@ -328,15 +355,16 @@ const ProjectLogs = () => {
             {
                 OpneCreateLogModal && <div onClick={() => setOpenCreateLogModal(false)} className='absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
                     <div onClick={(event) => { event.stopPropagation() }} data-aos="zoom-in" className='relative custom-shadow rounded-2xl w-[500px] h-auto py-[50px] bg-[#fff] flex justify-center items-center flex-col'>
-                        <input onChange={(e) => setLogName(e.target.value)} className='w-3/5 my-3 p-2 border border-[#ddd] focus:outline-none' placeholder='Log name' type="text" />
-                        <input onChange={(e) => {
-                            const inputValue = new Date(e.target.value)
-                            const isoDate = inputValue.toISOString()
-                            setLogDueDate(isoDate)
-                        }} className='w-3/5 my-3 p-2 border border-[#ddd] text-[#A8A8A8] focus:outline-none'
-                            placeholder="dd/mm/yyyy"
+                        <input defaultValue={logName} onChange={(e) => setLogName(e.target.value)} className='w-3/5 my-3 p-2 border border-[#ddd] focus:outline-none' placeholder='Log name' type="text" />
 
-                            type="date" />
+                        <div className='w-3/5 my-3 p-2 border border-[#ddd] text-[#A8A8A8] flex justify-between items-center'>
+                            <span>{logDueDate ? format(new Date(logDueDate), "dd/MM/y") : "DD/MM/YY"}</span>
+                            <span onClick={() => {
+                                setOpenCalender(true)
+                                setOpenCreateLogModal(false)
+                            }} className='cursor-pointer'><FaRegCalendarDays size={24} /></span>
+                        </div>
+
 
                         <button onClick={() => {
                             if (logName && logDueDate) {
@@ -345,6 +373,31 @@ const ProjectLogs = () => {
                             }
 
                         }} className='mt-10 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Create</button>
+                    </div>
+                </div>
+            }
+
+            {
+                openCalender && <div onClick={() => {
+                    setOpenCalender(false)
+                    setOpenCreateLogModal(true)
+
+                }} className='absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
+                    <div onClick={(event) => { event.stopPropagation() }} data-aos="zoom-in" className='relative custom-shadow rounded-2xl w-[400px] h-auto py-[40px] bg-[#fff] flex justify-center items-center flex-col'>
+                        <span className='border rounded-md py-3 px-6'>{logDueDate ? format(new Date(logDueDate), "dd/MM/y") : "DD/MM/YY"}</span>
+                        <Calendar
+
+                            color='#30FFE4'
+                            onChange={(date) => {
+                                const isoDate = date.toISOString()
+                                setLogDueDate(isoDate)
+                                console.log(logDueDate)
+                            }}
+                        />
+                        <button onClick={() => {
+                            setOpenCreateLogModal(true)
+                            setOpenCalender(false)
+                        }} className=' bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Select</button>
                     </div>
                 </div>
             }
@@ -394,11 +447,13 @@ const ProjectLogs = () => {
                                     <div>
                                         <p className='mb-2 text-xl font-semibold text-gray-900'>Due Date</p>
                                         <div className="mb-6">
-                                            <input onChange={(e) => {
-                                                const inputValue = new Date(e.target.value)
-                                                const isoDate = inputValue.toISOString()
-                                                setDescriptionDate(isoDate)
-                                            }} type="date" id="tags" className="block w-full p-5 text-xl border border-[#CBCBCB] rounded-2xl text-[#ABABAB] placeholder:text-xl focus:outline-none" />
+                                            <div className=' w-full p-5 text-xl border border-[#CBCBCB] rounded-2xl text-[#ABABAB] flex justify-between items-center '>
+                                                <span>{descriptionDate ? format(new Date(descriptionDate), "dd/MM/y") : "DD/MM/YY"}</span>
+                                                <span onClick={() => {
+                                                    setOpenRiskCalender(true)
+
+                                                }} className='cursor-pointer'><FaRegCalendarDays size={24} /></span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
@@ -429,6 +484,29 @@ const ProjectLogs = () => {
                                 <button onClick={handleSubmit} disabled={!riskDescription || !controlDescription || !descriptionDate || !assignedName || !logTags.length} className='mt-20 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Submit</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            }
+            {
+                openRiskCalender && <div onClick={() => {
+                    setOpenRiskCalender(false)
+
+
+                }} className='absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
+                    <div onClick={(event) => { event.stopPropagation() }} data-aos="zoom-in" className='relative custom-shadow rounded-2xl w-[400px] h-auto py-[40px] bg-[#fff] flex justify-center items-center flex-col'>
+                        <span className='border rounded-md py-3 px-6'>{descriptionDate ? format(new Date(descriptionDate), "dd/MM/y") : "DD/MM/YY"}</span>
+                        <Calendar
+
+                            color='#30FFE4'
+                            onChange={(date) => {
+                                const isoDate = date.toISOString()
+                                setDescriptionDate(isoDate)
+
+                            }}
+                        />
+                        <button onClick={() => {
+                            setOpenRiskCalender(false)
+                        }} className=' bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Select</button>
                     </div>
                 </div>
             }
@@ -513,11 +591,13 @@ const ProjectLogs = () => {
                                     <div>
                                         <p className='mb-2 text-xl font-semibold text-gray-900'>Due Date</p>
                                         <div className="mb-6">
-                                            <input onChange={(e) => {
-                                                const inputValue = new Date(e.target.value)
-                                                const isoDate = inputValue.toISOString()
-                                                setDescriptionDate(isoDate)
-                                            }} type="date" id="tags" className="block w-full p-5 text-xl border border-[#CBCBCB] rounded-2xl text-[#ABABAB] placeholder:text-xl focus:outline-none" />
+                                            <div className=' w-full p-5 text-xl border border-[#CBCBCB] rounded-2xl text-[#ABABAB] flex justify-between items-center '>
+                                                <span>{descriptionDate ? format(new Date(descriptionDate), "dd/MM/y") : "DD/MM/YY"}</span>
+                                                <span onClick={() => {
+                                                    setOpenActionCalender(true)
+
+                                                }} className='cursor-pointer'><FaRegCalendarDays size={24} /></span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
@@ -551,6 +631,30 @@ const ProjectLogs = () => {
                     </div>
                 </div>
             }
+            {
+                openActionCalender && <div onClick={() => {
+                    setOpenActionCalender(false)
+
+
+                }} className='absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
+                    <div onClick={(event) => { event.stopPropagation() }} data-aos="zoom-in" className='relative custom-shadow rounded-2xl w-[400px] h-auto py-[40px] bg-[#fff] flex justify-center items-center flex-col'>
+                        <span className='border rounded-md py-3 px-6'>{descriptionDate ? format(new Date(descriptionDate), "dd/MM/y") : "DD/MM/YY"}</span>
+                        <Calendar
+
+                            color='#30FFE4'
+                            onChange={(date) => {
+                                const isoDate = date.toISOString()
+                                setDescriptionDate(isoDate)
+                            }}
+                        />
+                        <button onClick={() => {
+
+                            setOpenActionCalender(false)
+                        }} className=' bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Select</button>
+                    </div>
+                </div>
+            }
+
             {
                 openActionPersonSearchModal && <div onClick={() => setOpenActionPersonSearchModal(false)} className='absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
 

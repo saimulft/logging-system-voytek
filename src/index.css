@@ -18,7 +18,9 @@ button:disabled{
     background-color:#30ffe36b;
     cursor: not-allowed;
 }
-
+.rdrSelected{
+    color: #30FFE4!important;
+}
 /* customize dateRange styles */
 .rdrCalendarWrapper{
     font-size: 16px !important;

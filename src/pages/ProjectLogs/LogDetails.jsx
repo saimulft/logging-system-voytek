@@ -264,6 +264,9 @@ const LogDetails = () => {
             .then(data => {
                 setRefetch(!refetch)
                 setIsUpdate(!isUpdate)
+                setRiskDescription('')
+                setActionDescription('')
+                setControlDescription("")
             })
             .catch(error => console.log(error))
     }
@@ -364,7 +367,9 @@ const LogDetails = () => {
                                 setDescriptionDueDate(isoDate)
                             }} className='border border-[#ddd] p-3 rounded-xl focus:outline-none' defaultValue={formattedToday} type="date" />
                         </div>
-                        <div><button onClick={handleAddDescription} className='block ml-auto bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Add</button></div>
+                        {log_type == "Risk" && <div><button disabled={!controlDescription || !riskDescription} onClick={handleAddDescription} className='block ml-auto bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Add</button></div>}
+
+                        {log_type == "Action" && <div><button disabled={!controlDescription || !actionDescription} onClick={handleAddDescription} className='block ml-auto bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Add</button></div>}
                     </div>
 
                     :

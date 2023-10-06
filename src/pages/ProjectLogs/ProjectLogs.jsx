@@ -19,7 +19,6 @@ const ProjectLogs = () => {
     const [loading, setLoading] = useState(true)
     const [projectLogs, setProjectLogs] = useState([])
     const [refetch, setRefetch] = useState(false)
-    const ref = useRef()
     const [openFilterModal, setOpenFilterModal] = useState(false)
     const [OpneCreateLogModal, setOpenCreateLogModal] = useState(false)
     const [openTaskTypeModal, setOpenTaskTypeModal] = useState(false)
@@ -60,7 +59,6 @@ const ProjectLogs = () => {
     const pages = Math.ceil(totalLogs / 4)
     const pagesNumber = totalLogs && [...Array(pages).keys()]
 
-    console.log(descriptionDate)
 
     useEffect(() => {
         fetch(`${import.meta.env.VITE_BASE_URL}/total-logs/${id}?logStatus=${logStatus}`)
@@ -391,7 +389,7 @@ const ProjectLogs = () => {
                             onChange={(date) => {
                                 const isoDate = date.toISOString()
                                 setLogDueDate(isoDate)
-                                console.log(logDueDate)
+                               
                             }}
                         />
                         <button onClick={() => {

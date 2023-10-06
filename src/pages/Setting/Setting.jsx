@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import { FaAnglesLeft } from 'react-icons/fa6';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../providers/AuthProvider';
 import Cookies from 'js-cookie';
 
@@ -10,15 +10,16 @@ const Setting = () => {
     const { user, setUser } = useContext(AuthContext)
     const location = useLocation()
     const from = location.state?.from?.pathname || '/';
+    const navigate = useNavigate()
 
     const handleSignout = () => {
         Cookies.remove("loginToken")
         setUser(null)
     }
-
+    
     const handleChangePassword = () => {
         if(!password || !confirmPassword){
-            return console("Fill the input fileds in order to change password")
+            return;
         }
         else if (password && password === confirmPassword) {
             fetch(`${import.meta.env.VITE_BASE_URL}/change-password`, {
@@ -32,11 +33,12 @@ const Setting = () => {
                 .then(data => {
                     setPassword('')
                     setconfirmPassword('')
+                    navigate(from)
                 })
                 .catch(error => console.log(error))
         }
         else {
-            return console.log('Change password and confirm password must be same')
+            return ;
         }
     }
 
@@ -46,10 +48,10 @@ const Setting = () => {
             <h1 className="mb-16 text-4xl text-center font-bold">Settings</h1>
             <div className='mb-16 space-y-12 '>
                 <div className="mb-6">
-                    <input onChange={(e) => setPassword(e.target.value)} type="text" id="password" className="block w-full p-5 text-xl text-gray-900 border border-[#948C8C] rounded-lg bg-gray-50 placeholder:text-[#ABABAB] placeholder:text-xl focus:outline-none" placeholder='Change Password' />
+                    <input onChange={(e) => setPassword(e.target.value)} value={password} type="text" id="password" className="block w-full p-5 text-xl text-gray-900 border border-[#948C8C] rounded-lg bg-gray-50 placeholder:text-[#ABABAB] placeholder:text-xl focus:outline-none" placeholder='Change Password' />
                 </div>
                 <div className="mb-6">
-                    <input onChange={(e) => setconfirmPassword(e.target.value)} type="text" id="confirmPassword" className="block w-full p-5 text-xl text-gray-900 border border-[#948C8C] rounded-lg bg-gray-50 placeholder:text-[#ABABAB] placeholder:text-xl focus:outline-none" placeholder='Confirm Password' />
+                    <input onChange={(e) => setconfirmPassword(e.target.value)} value={confirmPassword} type="text" id="confirmPassword" className="block w-full p-5 text-xl text-gray-900 border border-[#948C8C] rounded-lg bg-gray-50 placeholder:text-[#ABABAB] placeholder:text-xl focus:outline-none" placeholder='Confirm Password' />
                 </div>
             </div>
             <div className='flex justify-center items-center gap-8'>

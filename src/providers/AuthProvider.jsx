@@ -2,9 +2,10 @@ import React, { createContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 export const AuthContext = createContext(null)
 
-const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => { 
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
+
 
     const token = Cookies.get("loginToken")
 
@@ -16,12 +17,10 @@ const AuthProvider = ({ children }) => {
 
             if (data.status === 'success') {
                 setUser(data.userData)
-                console.log(data.message);
             }
-            else {
-                console.log(data.message)
-            }
+            
         }
+
         return () => fetchUser();
     }, [token])
 

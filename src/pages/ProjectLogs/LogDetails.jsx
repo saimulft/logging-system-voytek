@@ -327,7 +327,7 @@ const LogDetails = () => {
                 <ClipLoader color="#000000" loading={loading} size={50} />
             </div>}
 
-            <div className='max-w-7xl mx-auto relative w-full h-full p-12'>
+            <div className='max-w-[1400px] mx-auto relative w-full h-full p-12'>
                 <div className='grid grid-cols-3'>
                     {isUpdate ? <div onClick={() => setIsUpdate(false)} className='cursor-pointer'><FaAnglesLeft size={24} /></div> : <Link to={from} onClick={() => setIsUpdate(false)} className='cursor-pointer'><FaAnglesLeft size={24} /></Link>}
 
@@ -356,7 +356,7 @@ const LogDetails = () => {
                             <textarea onChange={(e) =>
                                 log_type === "Risk" ? setRiskDescription(e.target.value) : setActionDescription(e.target.value)
                             } className='w-full p-2 text-xl border border-[#ddd] focus:outline-none' name="" id="" cols="50" rows="1"></textarea>
-                            <h1 className='mb-3 text-3xl mt-10'>Control Description</h1>
+                            <h1 className='mb-3 text-3xl mt-10'>{log_type === "Risk" ? "Control Description" :"Risk Description"}</h1>
                             <textarea onChange={(e) => setControlDescription(e.target.value)} className='w-full p-2 text-xl border border-[#ddd] focus:outline-none' name="" id="" cols="50" rows="1"></textarea>
                         </div>
 
@@ -384,7 +384,7 @@ const LogDetails = () => {
                         <div className='grid grid-cols-4 mt-20 mb-16 gap-4'>
                             <div className={!isEdit ? 'relative border-2 border-[#00000066] p-2 rounded-xl' : ''}>
                                 {!isEdit && <FiEdit onClick={() => setDueDateEdit(true)} size={18} className='absolute top-3 right-4 cursor-pointer' />}
-                                <p className='font-semibold text-xl'>Due Date</p>
+                                <p className='font-semibold text-xl'>Log Date</p>
                                 <p className='font-semibold text-xl'>{log_due_date && format(new Date(log_due_date), "dd/MM/y")}</p>
                             </div>
                             <div className={!isEdit ? 'relative text-center border-2 border-[#00000066] rounded-xl p-2' : 'text-center'}>
@@ -429,7 +429,7 @@ const LogDetails = () => {
                             }
                         </div>
                         <div className='mt-12'>
-                            <h1 className='mb-3 text-3xl'>Control Description</h1>
+                            <h1 className='mb-3 text-3xl'>{log_type === "Risk" ? "Control Description" :"Risk Description"} </h1>
                             {
                                 log_description?.control_description.map(desc => <div key={desc.id} className='relative w-full'>
                                     {!isEdit && <FiEdit onClick={() => {

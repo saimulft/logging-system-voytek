@@ -43,12 +43,12 @@ const Setting = () => {
     }
 
     return (
-        <section className='relative max-w-7xl mx-auto  p-12'>
+        <section className='relative max-w-[1400px] mx-auto  p-12'>
             <Link to={from} className='absolute top-[70px] cursor-pointer'><FaAnglesLeft size={24} /></Link>
             <h1 className="mb-16 text-4xl text-center font-bold">Settings</h1>
             <div className='mb-16 space-y-12 '>
                 <div className="mb-6">
-                    <input onChange={(e) => setPassword(e.target.value)} value={password} type="text" id="password" className="block w-full p-5 text-xl text-gray-900 border border-[#948C8C] rounded-lg bg-gray-50 placeholder:text-[#ABABAB] placeholder:text-xl focus:outline-none" placeholder='Change Password' />
+                    <input onChange={(e) => setPassword(e.target.value)} value={password} type="text" id="password" className="block w-full p-5 text-xl text-gray-900 border border-[#948C8C] rounded-lg bg-gray-50 placeholder:text-[#ABABAB] placeholder:text-xl focus:outline-none" placeholder='New Password' />
                 </div>
                 <div className="mb-6">
                     <input onChange={(e) => setconfirmPassword(e.target.value)} value={confirmPassword} type="text" id="confirmPassword" className="block w-full p-5 text-xl text-gray-900 border border-[#948C8C] rounded-lg bg-gray-50 placeholder:text-[#ABABAB] placeholder:text-xl focus:outline-none" placeholder='Confirm Password' />
@@ -58,7 +58,7 @@ const Setting = () => {
                 {
                     user && <button onClick={handleSignout} className='text-xl block bg-[#30FFE4] py-4 px-20 rounded-2xl font-semibold'>Signout</button>
                 }
-                <button onClick={handleChangePassword} className='text-xl block bg-[#30FFE4] py-4 px-20 rounded-2xl font-semibold'>Done</button>
+                <button onClick={handleChangePassword} className='text-xl block bg-[#30FFE4] py-4 px-20 rounded-2xl font-semibold'>Update Password</button>
             </div>
         </section>
     );

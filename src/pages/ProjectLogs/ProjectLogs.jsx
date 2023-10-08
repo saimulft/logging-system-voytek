@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FaAnglesLeft, FaAnglesRight } from 'react-icons/fa6';
+import { FaAnglesLeft, FaAnglesRight, FaSpinner } from 'react-icons/fa6';
 import { RiFileExcel2Fill } from 'react-icons/ri';
 import { FaFileDownload } from 'react-icons/fa';
 import { IoSettingsSharp } from 'react-icons/io5';
@@ -53,8 +53,11 @@ const ProjectLogs = () => {
     const [openCalender, setOpenCalender] = useState(false)
     const [openRiskCalender, setOpenRiskCalender] = useState(false)
     const [openActionCalender, setOpenActionCalender] = useState(false)
+    const [imageError, setImageError] = useState('')
+    const [imageLoading, setImageLoading] = useState(false)
+
     // pagination related works
-    
+
     const [currentPage, setCurrentPage] = useState(1)
     const [totalLogs, setTotalLogs] = useState(0)
     const pages = Math.ceil(totalLogs / 4)
@@ -102,7 +105,8 @@ const ProjectLogs = () => {
     }, [assignedSearch, refetch])
 
     const handleSubmit = () => {
-        setLogConfirmationModal(true)
+
+        setImageLoading(true)
         const logId = uuidv4();
 
         const riskDesc = {
@@ -126,7 +130,7 @@ const ProjectLogs = () => {
         })
             .then(res => res.json())
             .then(data => {
-                setRefetch(!refetch)
+
                 setAssignedName('')
                 setAssignedSearch('')
                 setLogTags([])
@@ -134,7 +138,9 @@ const ProjectLogs = () => {
                 const formData = new FormData()
                 formData.append('image', sendImageFile)
 
+
                 if (uploadImage) {
+
                     fetch(`${import.meta.env.VITE_BASE_URL}/uploadImage?name=${assignedName}&id=${uuidv4()}&projectId=${id}&logId=${logId}`, {
                         method: 'POST',
                         body: formData,
@@ -143,7 +149,10 @@ const ProjectLogs = () => {
                         },
                     })
                         .then((response) => {
+                            setLogConfirmationModal(true)
+                            setImageLoading(false)
                             setRefetch(!refetch)
+
                         })
                 }
             })
@@ -169,6 +178,14 @@ const ProjectLogs = () => {
 
         setUploadImage(true)
         setAssignedImage('')
+        if (e.target.files[0]) {
+            const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+            if (e.target.files[0].size > maxSizeInBytes) {
+                setImageError("Image file size should be less than 2 MB")
+            } else {
+                setImageError('')
+            }
+        }
     }
 
     const handleAssignData = (person) => {
@@ -240,7 +257,7 @@ const ProjectLogs = () => {
     };
 
     return (
-        <div className='max-w-screen-xl mx-auto h-screen p-12'>
+        <div className='max-w-[1400px] mx-auto h-screen p-12'>
             <div className='flex items-center justify-between mb-20'>
                 <Link to="/">
                     <FaAnglesLeft size={24} />
@@ -273,7 +290,7 @@ const ProjectLogs = () => {
                     projectLogs?.map((log, index) => <Link to={`/logs/log/${log.log_id}?projectId=${id}`} state={{ from: location }} key={index}>
                         <div className=' py-5 flex justify-between items-center text-center rounded-2xl custom-shadow mb-10'>
                             <div className='text-lg font-medium w-1/5'>
-                                <p>Due Data</p>
+                                <p>Log Date</p>
                                 <p>{format(new Date(log.log_due_date), "dd/MM/y")}</p>
                             </div>
                             <div className='text-lg font-medium w-1/5'>
@@ -296,20 +313,33 @@ const ProjectLogs = () => {
 
                                         log.log_type === 'Risk' ? log?.log_description?.risk_description[log?.log_description?.risk_description.length - 1]?.content.slice(0, 22) : log?.log_description?.action_description[log?.log_description?.action_description.length - 1]?.content.slice(0, 22)
                                     }
-                                  {   log.log_type === 'Risk' && <span>
+                                    {log.log_type === 'Risk' && <span>
                                         {
-                                        log?.log_description?.risk_description[log?.log_description?.risk_description.length - 1].content.length > 20 && "..."
-                                        
+                                            log?.log_description?.risk_description[log?.log_description?.risk_description.length - 1].content.length > 20 && "..."
+
                                         }
 
                                     </span>}
-                                  {   log.log_type === 'Action' && <span>
+                                    {log.log_type === 'Action' && <span>
                                         {
-                                        log?.log_description?.action_description[log?.log_description?.action_description.length - 1].content.length > 20 && "..."
-                                        
+                                            log?.log_description?.action_description[log?.log_description?.action_description.length - 1].content.length > 20 && "..."
+
                                         }
 
                                     </span>}
+                                </p>
+                            </div>
+
+                            <div className='w-1/5'>
+                                <p className='text-xl font-medium'>Due Date</p>
+                                <p className='text-lg font-medium  '>
+                                    {
+
+                                        log?.log_type === 'Risk' ? format(new Date(log?.log_description?.risk_description[log?.log_description?.risk_description.length - 1].date), "dd/MM/y")
+                                            :
+
+                                            format(new Date(log?.log_description?.action_description[log?.log_description?.action_description.length - 1].date), "dd/MM/y")
+                                    }
                                 </p>
                             </div>
                             <div className='w-1/5'>
@@ -390,7 +420,7 @@ const ProjectLogs = () => {
                             onChange={(date) => {
                                 const isoDate = date.toISOString()
                                 setLogDueDate(isoDate)
-                               
+
                             }}
                         />
                         <button onClick={() => {
@@ -425,7 +455,7 @@ const ProjectLogs = () => {
             {/* risk log detail modal */}
             {
                 openRiskLogModal && <div className='absolute top-0 left-0 w-full h-full bg-[#ffffff]'>
-                    <div className="max-w-7xl mx-auto p-12">
+                    <div className="max-w-[1400px] mx-auto p-12">
                         <h3 className='text-4xl font-bold text-center mb-20'>Logs</h3>
 
                         <div className='flex justify-between'>
@@ -480,7 +510,7 @@ const ProjectLogs = () => {
                                     </div>
                                 </div>
 
-                                <button onClick={handleSubmit} disabled={!riskDescription || !controlDescription || !descriptionDate || !assignedName || !logTags.length} className='mt-20 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Submit</button>
+                                <button onClick={handleSubmit} disabled={!riskDescription || !controlDescription || !descriptionDate || !assignedName || !logTags.length || imageError || imageLoading} className='flex items-center gap-3 mt-20 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'> {imageLoading && <span className='animate-spin'><FaSpinner size={20} /></span>} Submit</button>
                             </div>
                         </div>
                     </div>
@@ -555,8 +585,8 @@ const ProjectLogs = () => {
                             className="relative m-0 block w-1/2 min-w-0 flex-auto cursor-pointer rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] font-normal leading-[2.15] text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary"
                             onChange={handleImage} name="image" type="file" accept='image/*'
                         />
-
-                        <button onClick={() => {
+                        {imageError && <p className='text-sm font-medium text-rose-500 pt-2'>{imageError}</p>}
+                        <button disabled={imageError} onClick={() => {
                             if (assignedName && imageFile) {
                                 setOpenRiskCreateUserModal(false)
                             }
@@ -569,7 +599,7 @@ const ProjectLogs = () => {
             {/* action log detail modal */}
             {
                 openActionLogModal && <div className='absolute top-0 left-0 w-full h-full bg-[#ffffff]'>
-                    <div className="max-w-7xl mx-auto p-12">
+                    <div className="max-w-[1400px] mx-auto p-12">
                         <h3 className='text-4xl font-bold text-center mb-20'>Logs</h3>
 
                         <div className='flex justify-between'>
@@ -624,7 +654,7 @@ const ProjectLogs = () => {
                                     </div>
                                 </div>
 
-                                <button onClick={handleSubmit} disabled={!riskDescription || !controlDescription || !descriptionDate || !assignedName || !logTags.length} className='mt-20 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Submit</button>
+                                <button onClick={handleSubmit} disabled={!riskDescription || !controlDescription || !descriptionDate || !assignedName || !logTags.length || imageError || imageLoading} className='flex items-center gap-3 mt-20 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'> {imageLoading && <span className='animate-spin'><FaSpinner size={20} /></span>} Submit</button>
                             </div>
                         </div>
                     </div>

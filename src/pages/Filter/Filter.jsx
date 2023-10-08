@@ -138,7 +138,7 @@ const Filter = ({ setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, c
     return (
         <div className='w-screen h-screen absolute top-0 left-0 bg-white'>
             <div className="relative">
-                <div className='max-w-screen-xl mx-auto h-screen p-12 relative'>
+                <div className='max-w-[1400px] mx-auto h-screen p-12 relative'>
                     <span onClick={() => setOpenFilterModal(false)} className='absolute top-10 right-10 cursor-pointer'><IoClose size={50} /></span >
                     <div className='py-3 w-fit mx-auto flex items-center font-semibold text-[#A8A8A8] border border-[#CBCBCB] rounded-2xl mb-20'>
                         <div className='px-20'>
@@ -211,7 +211,7 @@ const Filter = ({ setProjectLogs, setOpenFilterModal, projectId, setTotalLogs, c
                 {/* date range modal */}
                 {
                     openDateRangeModal && <div className='absolute top-0 left-0 w-full h-full bg-[#ffffff]'>
-                        <div className="max-w-7xl mx-auto px-12 py-20">
+                        <div className="max-w-[1400px] mx-auto px-12 py-20">
                             <div className='flex justify-between items-center mb-8'>
                                 <button onClick={handleAllUpcoming} className='bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold btn-shadow'>All Upcoming</button>
                                 <button onClick={handleOverDue} className='bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold btn-shadow'>Over Due</button>

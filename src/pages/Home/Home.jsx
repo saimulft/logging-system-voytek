@@ -100,7 +100,7 @@ const Home = () => {
 
     return (
         <section>
-            <div className='max-w-7xl mx-auto relative w-full h-screen p-12'>
+            <div className='max-w-[1400px] mx-auto relative w-full h-screen p-12'>
                 <Link to="/setting" state={{ from: location }} className='flex justify-center items-center w-12 h-12  custom-shadow absolute top-10 rounded-full right-12 cursor-pointer'>
                     <IoSettingsSharp size={24} />
                 </Link>

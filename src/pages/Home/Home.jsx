@@ -16,6 +16,11 @@ const Home = () => {
     const [singleProject, setSingleProject] = useState({})
     const location = useLocation()
 
+    const [isDeleteProject, setIsDeleteProject] = useState(false)
+    const [isDeleteModal, setIsDeleteModal] = useState(false)
+    const [projecId, setProjectid] = useState('')
+
+
     const [projectName, setProjectName] = useState('')
     const [client, setClient] = useState('')
     const [code, setCode] = useState('')
@@ -73,6 +78,25 @@ const Home = () => {
         const selectedProject = allProjects?.find(project => project._id === id)
         setSingleProject(selectedProject)
     }
+    const handleDeleteProject = () => {
+        fetch(`${import.meta.env.VITE_BASE_URL}/delete-project`, {
+            method: 'DELETE',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({ projecId })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.deletedCount) {
+                    setRefetch(!refetch)
+                    setIsDeleteModal(false)
+
+                }
+
+            })
+
+    }
 
     return (
         <section>
@@ -86,7 +110,7 @@ const Home = () => {
                 <button onClick={() => setSowAddProject(!showAddProject)} className='mt-8 custom-shadow ml-auto  block text-xl font-medium py-3 px-10 rounded-2xl bg-[#30FFE4]'>Add Project</button>
                 <div className='w-full grid grid-cols-4 mt-20 gap-[50px]'>
                     {
-                        allProjects?.map((project, index) => <SingleProject key={index} project={project} handleProjectDetails={handleProjectDetails} />)
+                        allProjects?.map((project, index) => <SingleProject setIsDeleteModal={setIsDeleteModal} setProjectid={setProjectid} key={index} project={project} handleProjectDetails={handleProjectDetails} />)
                     }
                 </div>
                 {/* loader / spinner */}
@@ -115,6 +139,19 @@ const Home = () => {
                 }
 
             </div>
+            {isDeleteModal &&
+                <div onClick={() => setIsDeleteProject(!isDeleteProject)} className=' absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
+
+                    <div onClick={(e) => e.stopPropagation()} data-aos="zoom-in" className='relative custom-shadow rounded-2xl w-[500px] h-auto py-[50px] px-10 bg-[#fff] flex justify-center items-center flex-col'>
+
+                        <p className='py-1 text-[25px] font-medium'>Are you sure ?</p>
+                        <div>
+                            <button onClick={() => setIsDeleteModal(false)} className='mt-8 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold mx-4'>No</button>
+                            <button onClick={handleDeleteProject} className='mt-8 bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold mx-4'>Yes</button>
+                        </div>
+                    </div>
+                </div>
+            }
             {showProjectDetails &&
                 <div onClick={() => setShowProjectDetails(!showProjectDetails)} className=' absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
 

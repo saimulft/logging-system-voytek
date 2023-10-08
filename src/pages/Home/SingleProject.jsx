@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BiNews } from 'react-icons/bi';
 import { FaRegEye } from 'react-icons/fa6';
+import { FaRegTrashCan } from 'react-icons/fa6';
 
 
-const SingleProject = ({ project, handleProjectDetails}) => {
-    const {_id, project_name, client_name, project_code} = project || {}
+const SingleProject = ({ project, handleProjectDetails, setProjectid, setIsDeleteModal }) => {
+    const { _id, project_name, client_name, project_code } = project || {}
+
+
+
+
+    const handleDelete = (id) => {
+
+        setProjectid(id)
+        setIsDeleteModal(true)
+    }
 
     return (
-        <div className=' bg-white custom-shadow rounded-2xl relative'>
-            <button onClick={() => handleProjectDetails(_id)} className='absolute top-3 right-4 cursor-pointer'> <FaRegEye size={24} /> </button>
+        <div className=' bg-white custom-shadow rounded-2xl relative '>
+            <div className='absolute top-3 right-4 flex items-center gap-4'>
+                <button onClick={() => handleDelete(_id)} className='cursor-pointer'> <FaRegTrashCan size={20} /> </button>
+                <button onClick={() => handleProjectDetails(_id)} className='cursor-pointer'> <FaRegEye size={24} /> </button>
+
+            </div>
             <Link to={`/project/logs/${_id}`}>
                 <div className='flex justify-center items-center flex-col p-8'>
                     <BiNews className='text-4xl' />

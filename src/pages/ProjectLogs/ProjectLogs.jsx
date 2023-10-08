@@ -54,6 +54,7 @@ const ProjectLogs = () => {
     const [openRiskCalender, setOpenRiskCalender] = useState(false)
     const [openActionCalender, setOpenActionCalender] = useState(false)
     // pagination related works
+    
     const [currentPage, setCurrentPage] = useState(1)
     const [totalLogs, setTotalLogs] = useState(0)
     const pages = Math.ceil(totalLogs / 4)
@@ -89,8 +90,8 @@ const ProjectLogs = () => {
                 const filteredArray = [];
                 const uniqueIds = {};
                 data.forEach((obj) => {
-                    if (!uniqueIds[obj.assigned[0].assinged_person_id]) {
-                        uniqueIds[obj.assigned[0].assinged_person_id] = true;
+                    if (!uniqueIds[obj?.assigned[0]?.assinged_person_id]) {
+                        uniqueIds[obj?.assigned[0]?.assinged_person_id] = true;
                         filteredArray.push(obj);
                     }
                 });
@@ -171,9 +172,9 @@ const ProjectLogs = () => {
     }
 
     const handleAssignData = (person) => {
-        setAssignedName(person.assigned[0].name)
-        setAssignedImage(person.assigned[0].image)
-        setAssingedPersonId(person.assigned[0].assinged_person_id)
+        setAssignedName(person?.assigned[0]?.name)
+        setAssignedImage(person?.assigned[0]?.image)
+        setAssingedPersonId(person?.assigned[0]?.assinged_person_id)
         setOpenRiskPersonSearchModal(false)
         setOpenActionPersonSearchModal(false)
 

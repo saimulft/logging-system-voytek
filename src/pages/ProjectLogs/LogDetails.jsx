@@ -1,4 +1,4 @@
-import { FaAnglesLeft } from 'react-icons/fa6';
+import { FaAnglesLeft, FaRegCalendarDays } from 'react-icons/fa6';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { MdOutlineDone } from 'react-icons/md';
 import { FiEdit } from 'react-icons/fi';
@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { BsSearch } from 'react-icons/bs';
 import ClipLoader from 'react-spinners/ClipLoader';
+import { Calendar } from 'react-date-range';
 
 const LogDetails = () => {
     const [loading, setLoading] = useState(true)
@@ -64,6 +65,7 @@ const LogDetails = () => {
     const [actionDescription, setActionDescription] = useState('')
     const [controlDescription, setControlDescription] = useState('')
     const [descriptionDueDate, setDescriptionDueDate] = useState(isoDate)
+    const [openCalender, setOpenCalender] = useState(false)
 
     useEffect(() => {
         fetch(`${import.meta.env.VITE_BASE_URL}/get-single-log?logId=${id}&projectId=${projectId}`)
@@ -87,7 +89,7 @@ const LogDetails = () => {
                     }
                 });
                 setAssignedData(filteredArray)
-                console.log(filteredArray)
+
             })
             .catch(error => console.log(error))
     }, [assignedSearch])
@@ -267,6 +269,7 @@ const LogDetails = () => {
                 setRiskDescription('')
                 setActionDescription('')
                 setControlDescription("")
+                setDescriptionDueDate("")
             })
             .catch(error => console.log(error))
     }
@@ -328,10 +331,7 @@ const LogDetails = () => {
                 <div className='grid grid-cols-3'>
                     {isUpdate ? <div onClick={() => setIsUpdate(false)} className='cursor-pointer'><FaAnglesLeft size={24} /></div> : <Link to={from} onClick={() => setIsUpdate(false)} className='cursor-pointer'><FaAnglesLeft size={24} /></Link>}
 
-
                     <div className='relative'>
-
-
                         <h1 className={!isEdit ? 'relative border-2 border-[#00000066] p-2 rounded-xl text-4xl font-bold text-center' : 'text-4xl font-bold text-center'}>{log_name}</h1>
                         {!isEdit && <FiEdit onClick={() => {
                             setLogNameEdit(true)
@@ -359,14 +359,21 @@ const LogDetails = () => {
                             <h1 className='mb-3 text-3xl mt-10'>Control Description</h1>
                             <textarea onChange={(e) => setControlDescription(e.target.value)} className='w-full p-2 text-xl border border-[#ddd] focus:outline-none' name="" id="" cols="50" rows="1"></textarea>
                         </div>
+
                         <div className='mt-12'>
                             <p className='text-xl mb-6'>Date (Optional)</p>
-                            <input onChange={(e) => {
-                                const inputValue = new Date(e.target.value)
-                                const isoDate = inputValue.toISOString()
-                                setDescriptionDueDate(isoDate)
-                            }} className='border border-[#ddd] p-3 rounded-xl focus:outline-none' defaultValue={formattedToday} type="date" />
+
+                            <div className="mb-6">
+                                <div className=' w-1/4 p-3 text-xl border border-[#CBCBCB] rounded-2xl text-[#ABABAB] flex justify-between items-center '>
+                                    <span>{descriptionDueDate ? format(new Date(descriptionDueDate), "dd/MM/y") : format(new Date(today), "dd/MM/y")}</span>
+                                    <span onClick={() => {
+                                        setOpenCalender(true)
+
+                                    }} className='cursor-pointer'><FaRegCalendarDays size={24} /></span>
+                                </div>
+                            </div>
                         </div>
+
                         {log_type == "Risk" && <div><button disabled={!controlDescription || !riskDescription} onClick={handleAddDescription} className='block ml-auto bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Add</button></div>}
 
                         {log_type == "Action" && <div><button disabled={!controlDescription || !actionDescription} onClick={handleAddDescription} className='block ml-auto bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Add</button></div>}
@@ -577,7 +584,29 @@ const LogDetails = () => {
                     <div><button onClick={handleUpdateLogName} className='block ml-auto bg-[#30FFE4] py-3 px-14 rounded-2xl font-semibold'>Update</button></div>
                 </div>
             </div>}
+            {
+                openCalender && <div onClick={() => {
+                    setOpenCalender(false)
 
+
+                }} className='absolute left-0 top-0 right-0 bottom-0 w-full h-full bg-[#d9d9d999] flex justify-center items-center'>
+                    <div onClick={(event) => { event.stopPropagation() }} data-aos="zoom-in" className='relative custom-shadow rounded-2xl w-[400px] h-auto py-[40px] bg-[#fff] flex justify-center items-center flex-col'>
+                        <span className='border rounded-md py-3 px-6'>{descriptionDueDate ? format(new Date(descriptionDueDate), "dd/MM/y") : "DD/MM/YY"}</span>
+                        <Calendar
+
+                            color='#30FFE4'
+                            onChange={(date) => {
+                                const isoDate = date.toISOString()
+                                setDescriptionDueDate(isoDate)
+
+                            }}
+                        />
+                        <button onClick={() => {
+                            setOpenCalender(false)
+                        }} className=' bg-[#30FFE4] py-3 px-14 rounded-2xl font-bold'>Select</button>
+                    </div>
+                </div>
+            }
         </section>
     );
 };

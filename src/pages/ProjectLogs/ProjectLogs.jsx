@@ -131,13 +131,9 @@ const ProjectLogs = () => {
             .then(res => res.json())
             .then(data => {
 
-                setAssignedName('')
-                setAssignedSearch('')
-                setLogTags([])
 
                 const formData = new FormData()
                 formData.append('image', sendImageFile)
-
 
                 if (uploadImage) {
 
@@ -149,17 +145,30 @@ const ProjectLogs = () => {
                         },
                     })
                         .then((response) => {
+
                             if (response.status === 200) {
                                 setLogConfirmationModal(true)
                                 setImageLoading(false)
                                 setRefetch(!refetch)
+                                setAssignedName('')
+                                setAssignedSearch('')
+                                setLogTags([])
+                                setLogName('')
+                                setLogDueDate('')
+                                setDescriptionDate('')
+                                setImageFile("")
+
                             }
                         })
+                }
+                else {
+                    setLogConfirmationModal(true)
+                    setImageLoading(false)
+                    setRefetch(!refetch)
                 }
             })
             .catch(error => console.log(error))
     }
-
     const handleCreateNewLog = () => {
         setLogConfirmationModal(false)
         setOpenRiskLogModal(false)
